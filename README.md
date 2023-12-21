@@ -43,6 +43,7 @@ ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0/
 
 Create a conda environment with the necessary packages: <br>
 `conda env create -f environment.yml` <br>
+This will also include CD-HIT and MAFFT from bioconda. <br>
 
 
 ## install local tools in environment
