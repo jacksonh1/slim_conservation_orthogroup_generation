@@ -37,6 +37,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0/
 ```
 - I have included example files in the `./data/orthoDB_sample_data/` directory as an example. These files are from orthoDB version 11.0 and are just subsets of the full files<br>
+- Note: *if you use a different version of orthoDB, you will need to change the file names in `./src/local_env_variables/env_variables.py`. File names are hard coded in the `orthoDB_files_object` class*
 
 ## conda environment
 

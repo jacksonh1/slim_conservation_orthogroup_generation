@@ -9,15 +9,67 @@ from attrs import frozen
 from Bio import Seq, SeqIO
 
 # from pyprojroot import here
-
-
 dotenv.load_dotenv()
 # dotenv.find_dotenv()
 orthodb_dir = Path(os.environ['ORTHODB_DATA_DIR'])
 
-# I'm not really sure if this is an appropriate use of attrs, but I really like
-# having the autocomplete and type checking when working with these files throughout
-# the codebase
+# ==============================================================================
+# // getting odb filepaths
+# ==============================================================================
+# Below is an attempt to deal with the fact that the orthoDB file names might change with different versions
+# file_wildcards = {
+#     "all_seqs_fasta": "*all_og.fasta",
+#     "gene_refs_tsv": "*_genes.tab",
+#     "gene_xrefs_tsv": "*gene_xrefs.tab",
+#     "ogs_tsv": "*OGs.tab",
+#     "OG2genes_tsv": "*OG2genes.tab",
+#     "levels_tsv": "*levels.tab",
+#     "levels2species_tsv": "*level2species.tab",
+#     "species_tsv": "*_species.tab",
+# }
+
+# odb_data_files = {}
+# for k, v in file_wildcards.items():
+#     try:
+#         odb_data_files[k] = next(orthodb_dir.glob(v))
+#     except StopIteration:
+#         raise FileNotFoundError(f"Could not find file for `{k}`. \nSearched with wildcard {orthodb_dir}/{v}")
+#     if len(list(orthodb_dir.glob(v))) > 1:
+#         raise FileNotFoundError(f"Found multiple files for `{k}`. \nSearched with wildcard {orthodb_dir}/{v}")
+
+# # The sqlite files are created by the scripts in scripts-gen_SQLite_dbs and I 
+# # want to import and use this library to retrieve those file names before they are created
+# # so I am not checking for their existence here.
+# odb_data_files["all_seqs_sqlite"] = odb_data_files["all_seqs_fasta"].with_suffix(".sqlite")
+# odb_data_files["gene_refs_sqlite"] = odb_data_files["gene_refs_tsv"].with_suffix(".sqlite")
+# odb_data_files["gene_xrefs_sqlite"] = odb_data_files["gene_xrefs_tsv"].with_suffix(".sqlite")
+# odb_data_files["ogs_sqlite"] = odb_data_files["ogs_tsv"].with_suffix(".sqlite")
+# odb_data_files["OG2genes_sqlite"] = odb_data_files["OG2genes_tsv"].with_suffix(".sqlite")
+# # later - add a way to output the sqlite files to a different directory specified in the .env file
+# odb_data_files = {k: str(v) for k, v in odb_data_files.items()}
+
+# # I'm not really sure if this is an appropriate use of attrs, but I really like
+# # having the autocomplete and type checking when working with these files throughout
+# # the codebase
+# @frozen
+# class orthoDB_files_object:
+#     all_seqs_fasta: str
+#     all_seqs_sqlite: str
+#     gene_refs_tsv: str
+#     gene_refs_sqlite: str
+#     gene_xrefs_tsv: str
+#     gene_xrefs_sqlite: str
+#     ogs_tsv: str
+#     ogs_sqlite: str
+#     OG2genes_tsv: str
+#     OG2genes_sqlite: str
+#     levels_tsv: str
+#     levels2species_tsv: str
+#     species_tsv: str
+
+# orthoDB_files = orthoDB_files_object(**odb_data_files)
+
+# if the above breaks because the filenames completely change, then you can hard code the filepaths here
 @frozen
 class orthoDB_files_object:
     all_seqs_fasta: str = str(orthodb_dir / "odb11v0_all_og.fasta")
@@ -33,10 +85,7 @@ class orthoDB_files_object:
     levels_tsv: str = str(orthodb_dir / "odb11v0_levels.tab")
     levels2species_tsv: str = str(orthodb_dir / "odb11v0_level2species.tab")
     species_tsv: str = str(orthodb_dir / "odb11v0_species.tab")
-
-
 orthoDB_files = orthoDB_files_object()
-
 
 # ==============================================================================
 # // data loading functions
@@ -70,77 +119,6 @@ all_human_seq_fasta = orthodb11v0 / "odb_proteome" / "all_human_proteins_in_odb.
 all_human_seq_clustered_fasta = orthodb11v0 / "odb_proteome" / "all_human_proteins_in_odb_clustered_c1.fasta"
 pipeline_script_example_folder = root / "pipeline_scripts" / "orthoDB_table_analysis"
 
-
-# ==============================================================================
-# // ODB filepaths
-# ==============================================================================
-
-'''
-
-'''
-
-
-
-
-
-# ==============================================================================
-# // ODB filepaths
-# ==============================================================================
-DATABASE_FILES = {
-    "all sequences - fasta": orthodb11v0 / "odb11v0_all_og.fasta",
-    "all sequences - sqlite": orthodb11v0 / "odb11v0_all_og.sqlite",
-    "gene xrefs full - tsv": orthodb11v0 / "odb11v0_gene_xrefs.tab",
-    "gene xrefs uniprot - tsv": (
-        orthodb11v0 / "odb11v0_gene_xrefs_grepd_Uniprot_JCH.tab"
-    ),
-    "gene xrefs uniprot human - tsv": (
-        orthodb11v0 / "odb11v0_gene_xrefs_grepd_Uniprot_9606_JCH.tab"
-    ),
-    "gene refs full - tsv": orthodb11v0 / "odb11v0_genes.tab",
-    "gene refs full - sqlite": orthodb11v0 / "odb11v0_genes.sqlite",
-    "ortholog groups (OGs) - tsv": orthodb11v0 / "odb11v0_OGs.tab",
-    "levels": orthodb11v0 / "odb11v0_levels.tab",
-    "species": orthodb11v0 / "odb11v0_species.tab",
-    "readme": orthodb11v0 / "README.txt",
-    "JCH readme": orthodb11v0 / "readme_JCH.txt",
-    "OG2genes - sqlite": orthodb11v0 / "odb11v0_OG2genes.sqlite",
-    "OGs per human gene - json": (
-        orthodb11v0 / "s01_OG_groups_for_each_human_gene.json"
-    ),
-    "gene refs human - tsv": (orthodb11v0 / "odb11v0_genes_grepd_9606_0_JCH.tab"),
-}
-
-
-DATABASE_FILE_DESCRIPTIONS = {
-    "all sequences - fasta": "all of the sequences in the database, in fasta format. Id's are the orthoDB gene ids",
-    "all sequences - sqlite": "sqlite database for all of the sequences in the database",
-    "gene xrefs full - tsv": "full list of alternate ids for each orthoDB gene id. For example UniProt ids, etc.. They are additional mappings not in the main gene refs file (like alternate uniprot ids). The full file is huge (19 GB)",
-    "gene xrefs uniprot - tsv": "gene xrefs file, but filtered to include only UniProt ids. 2 GB",
-    "gene xrefs uniprot human - tsv": "gene xrefs file, but filtered to include only UniProt ids for human genes. ~ 1 MB",
-    "gene refs full - tsv": "full list of gene ids, their orthoDB species ids, other ids (like Uniprot), and a description. Very large file (8.1 GB)",
-    "gene refs full - sqlite": "sqlite database for the gene refs full file",
-    "ortholog groups (OGs) - tsv": "515 MB file. Has the orthoDB OG ID and the taxon level that the group is constructed at. Also has a name for the OG, that is named after the most common gene in the group.",
-    "levels": "defines the OG taxon levels. Will correspond to the level in the OGs file. Also has the name of the level, and stats like the number of species below that level",
-    "species": "has NCBI taxon id, orthoDB species id, and the name of the species",
-    "readme": orthodb11v0 / "README.txt",
-    "JCH readme": orthodb11v0 / "readme_JCH.txt",
-    "OG2genes - sqlite": "sqlite database containing the different gene_ids for each OG_id"
-}
-
-# ==============================================================================
-# // functions to print info to screen
-# ==============================================================================
-def print_database_filepaths():
-    for k, v in DATABASE_FILES.items():
-        print(f"- {k}\n    {v}")
-
-def print_database_file_descriptions():
-    for k, v in DATABASE_FILE_DESCRIPTIONS.items():
-        print(f"- {k}\n    {v}")
-
-def print_orthoDB_readme():
-    with open(DATABASE_FILES["readme"], "r") as f:
-        print(f.read())
 
 # ==============================================================================
 # // functions to load data
