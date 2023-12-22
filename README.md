@@ -1,7 +1,20 @@
-# least divergent, clustered ortholog groups from orthoDB
-This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database (link) in preparation for downstream conservation analysis. <br>
+# Table of contents
+- [Table of contents](#table-of-contents)
+- [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
+  - [Pipeline overview:](#pipeline-overview)
+  - [comments](#comments)
+- [setup:](#setup)
+  - [Download orthoDB database files](#download-orthodb-database-files)
+  - [conda environment](#conda-environment)
+  - [install local tools in environment](#install-local-tools-in-environment)
+  - [generate SQLite databases for orthoDB files](#generate-sqlite-databases-for-orthodb-files)
 
-## Pipeline:
+
+# orthoDB groups for conservation analysis
+This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database ([link](https://www.orthodb.org/)) in preparation for downstream conservation analysis. <br><br>
+
+
+## Pipeline overview:
 1. Find a query protein in the orthoDB database (retrieve the corresponding orthoDB ID)
 2. Retrieve the orthoDB-defined groups of homologous sequences (orthogroup IDs) containing the query protein
 3. Select a group based on phylogenetic level
@@ -11,6 +24,21 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 6. Cluster the filtered LDOs using CD-HIT
 7. Align the clustered sequences using MAFFT
 8. output the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
+
+## comments
+The main advantages of using these tools:
+- the ability to query the orthoDB files quickly (using SQLite databases)
+    - The orthoDB files are very large and it is impractical to access them using normal methods (e.g. loading table into python and filtering based on a column value). The key is to pre-index the columns that you are going to filter on, however, it can't be done using normal text files. So I used SQLite to create databases with indexed columns. It makes the lookup time faster by orders of magnitude. The scripts to create the databases here index the columns that are used for lookups in the pipeline.
+- go straight from a query protein to a set of orthologs
+    - The OrthoDB database can be used for many different analyses. My specific use case is to just retrieve orthologs for a query protein. 
+    - Retrieving ortholog groups from the downloaded files requires cross-referencing multiple large files and linking different tables with ids. 
+    - I've basically figured all of that out for you so that it's easy to go from a query protein to a set of orthologs.
+- reducing ortholog groups to least divergent orthologs (LDOs). 
+    - This simplifies a conservation analysis by removing paralogs. It crudely assumes that the most similar sequence to the query sequence is sequence in that organism to compare with.
+    - You arguably lose information doing this, but it greatly simplifies the analysis when you are looking at conservation for a lot of proteins (too many to manually inspect all of the sequences/alignments)
+- clustering
+    - Clustering reduces sequence redundancy and results in a more even distribution of sequence diversity over the group, which is very helpful in a conservation analysis.
+        - Imagine you had a group of 100 homologs: 60 from primates with 99 % identity, 20 from other mammals, and 20 distributed across more distant Eukaryotes. The conservation analysis would be dominated by the primates and would not be very informative. The clustering would collapse the 60 primate sequences into one sequence, which would make the analysis more informative.
 
 
 # setup:
@@ -36,7 +64,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 ```
 ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0/
 ```
-- I have included example files in the `./data/orthoDB_sample_data/` directory as an example. These files are from orthoDB version 11.0 and are just subsets of the full files<br>
+- I have included example files in the `./data/orthoDB_sample_data/` directory. These files are from orthoDB version 11.0 and are just subsets of the full files<br>
 - Note: *if you use a different version of orthoDB, you will need to change the file names in `./src/local_env_variables/env_variables.py`. File names are hard coded in the `orthoDB_files_object` class*
 
 ## conda environment
