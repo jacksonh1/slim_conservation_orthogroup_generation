@@ -4,26 +4,31 @@
   - [Pipeline overview:](#pipeline-overview)
   - [comments](#comments)
 - [setup:](#setup)
+  - [setup TLDR:](#setup-tldr)
   - [Download orthoDB database files](#download-orthodb-database-files)
   - [conda environment](#conda-environment)
   - [install local tools in environment](#install-local-tools-in-environment)
   - [generate SQLite databases for orthoDB files](#generate-sqlite-databases-for-orthodb-files)
-
+- [Usage](#usage)
+- [Parameters](#parameters)
+  - [alignment](#alignment)
 
 # orthoDB groups for conservation analysis
 This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database ([link](https://www.orthodb.org/)) in preparation for downstream conservation analysis. <br><br>
 
-
 ## Pipeline overview:
-1. Find a query protein in the orthoDB database (retrieve the corresponding orthoDB ID)
-2. Retrieve the orthoDB-defined groups of homologous sequences (orthogroup IDs) containing the query protein
-3. Select a group based on phylogenetic level
-4. Filter out sequences in the group that are too short (relative to the length of the query sequence) or that contain non amino acid characters
-5. Filter to least divergent orthologs (LDOs):
+1. **Find a query protein in the orthoDB database** (retrieve the corresponding orthoDB ID)
+   - you can find a protein by looking up its uniprot ID in the orthoDB database. You can also set the orthoDB ID manually if you already know it. 
+   - *Note: If it can't find an orthoDB ID for a given UniprotID, it doesn't mean that the protein is absent from the orthoDB. It could still be present but was retrieved from a different database and a uniprot ID was not mapped to it. View OrthoDB documentation for more info on where the sequences come from. I have not solved this problem. In the future, it would be nice to develop a way to search for the actual full length sequence using blast or something, if it fails to find the uniprot ID*
+2. **Retrieve the orthoDB-defined groups of homologous sequences** (orthogroup IDs) containing the query protein
+3. **Select a group based on phylogenetic level**
+4. **Filter** out sequences in the group that are too short (relative to the length of the query sequence) or that contain non amino acid characters
+5. **Filter to least divergent orthologs (LDOs)**:
    - For each organism in the group, select the sequence that is most similar to the query sequence such that there is only one sequence per organism
-6. Cluster the filtered LDOs using CD-HIT
-7. Align the clustered sequences using MAFFT
-8. output the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
+6. **Cluster the filtered LDOs using CD-HIT**
+7. **Align the clustered sequences** (uses MAFFT by default)
+8. **output** the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
+    - the group information is output in the form of a json file that can be imported as a python object (see `./examples/` for examples of how to use the object)
 
 ## comments
 The main advantages of using these tools:
@@ -42,6 +47,15 @@ The main advantages of using these tools:
 
 
 # setup:
+
+## setup TLDR:
+1. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
+2. go to this directory in terminal
+3. edit the `.env` file: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
+4. create a new environment with the dependencies: `conda env create -f environment.yml` <br>
+5. activate the environment: `conda activate odb_groups_x86` <br>
+6. install the local package: `pip install .` <br>
+7. generate the SQLite databases: `bash ./prepare_data.sh` <br>
 
 ## Download orthoDB database files
 - download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
@@ -62,7 +76,7 @@ The main advantages of using these tools:
   - add a `ORTHODB_DATA_DIR` variable with the absolute path to the directory containing the downloaded files
   - example `.env` file: 
 ```
-ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0/
+ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0aa/
 ```
 - I have included example files in the `./data/orthoDB_sample_data/` directory. These files are from orthoDB version 11.0 and are just subsets of the full files<br>
 - Note: *if you use a different version of orthoDB, you will need to change the file names in `./src/local_env_variables/env_variables.py`. File names are hard coded in the `orthoDB_files_object` class*
@@ -75,6 +89,10 @@ This will also include CD-HIT and MAFFT from bioconda. <br>
 
 
 ## install local tools in environment
+
+**TLDR**: 
+- activate the environment: `conda activate odb_groups_x86`
+- run `pip install .` in this directory (where `setup.py` file is located) <br>
 
 I wrote this pipeline (code in `./src/`) for it to be installed in the environment as a local package. <br>
 I took inspiration from this example: https://github.com/ericmjl/Network-Analysis-Made-Simple <br>
@@ -99,3 +117,18 @@ bash ./prepare_data.sh
 
 Warning - this will take a while to run and I don't think it can be parallelized (Let me know if this is possible because I would love to know how if so). <br>
 
+*Note: I am creating a separate database for each file. You could easily make one database with all of the tables. I tried this but it was significantly slower to query and I don't know why.* <br>
+
+# Usage
+
+There are two main ways to use this pipeline: <br>
+1. generate ortholog groups for a small number of query proteins from a table
+2. generate ortholog groups for every protein in a organism's proteome
+
+example for choosing levels: https://www.orthodb.org/?query=pcare
+
+
+# Parameters
+
+## alignment
+you can use your own alignment program by changing the `ALIGNER_EXECUTABLE` variable in the `.env` file
