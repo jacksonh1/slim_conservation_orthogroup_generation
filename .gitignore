@@ -3,7 +3,7 @@
 !*/
 *.tar.gz
 make_odb_example_dataset/
-data/
+# data/
 development/
 workspace.code-workspace
 .vscode/
