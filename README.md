@@ -3,8 +3,8 @@
 - [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
   - [comments](#comments)
+- [setup TLDR:](#setup-tldr)
 - [setup:](#setup)
-  - [setup TLDR:](#setup-tldr)
   - [Download orthoDB database files](#download-orthodb-database-files)
   - [conda environment](#conda-environment)
   - [install local tools in environment](#install-local-tools-in-environment)
@@ -46,16 +46,17 @@ The main advantages of using these tools:
         - Imagine you had a group of 100 homologs: 60 from primates with 99 % identity, 20 from other mammals, and 20 distributed across more distant Eukaryotes. The conservation analysis would be dominated by the primates and would not be very informative. The clustering would collapse the 60 primate sequences into one sequence, which would make the analysis more informative.
 
 
-# setup:
+# setup TLDR:
+1. download this repository
+2. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
+3. navigate to this downloaded repository in terminal (where this README file is located)
+4. edit the `.env` file with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
+5. create a new environment with the dependencies: `conda env create -f environment.yml` <br>
+6. activate the environment: `conda activate odb_groups_x86` <br>
+7. install the local package: `pip install .` <br>
+8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
 
-## setup TLDR:
-1. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
-2. go to this directory in terminal
-3. edit the `.env` file: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
-4. create a new environment with the dependencies: `conda env create -f environment.yml` <br>
-5. activate the environment: `conda activate odb_groups_x86` <br>
-6. install the local package: `pip install .` <br>
-7. generate the SQLite databases: `bash ./prepare_data.sh` <br>
+# setup:
 
 ## Download orthoDB database files
 - download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
