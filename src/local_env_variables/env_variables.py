@@ -16,6 +16,35 @@ orthodb_dir = Path(os.environ['ORTHODB_DATA_DIR'])
 # ==============================================================================
 # // getting odb filepaths
 # ==============================================================================
+
+@frozen
+class orthoDB_files_object:
+    all_seqs_fasta: str = str(orthodb_dir / "odb11v0_all_og.fasta")
+    all_seqs_sqlite: str = str(orthodb_dir / "odb11v0_all_og.sqlite")
+    gene_refs_tsv: str = str(orthodb_dir / "odb11v0_genes.tab")
+    gene_refs_sqlite: str = str(orthodb_dir / "odb11v0_genes.sqlite")
+    gene_xrefs_tsv = str(orthodb_dir / "odb11v0_gene_xrefs.tab")
+    gene_xrefs_sqlite = str(orthodb_dir / "odb11v0_gene_xrefs.sqlite")
+    ogs_tsv: str = str(orthodb_dir / "odb11v0_OGs.tab")
+    ogs_sqlite: str = str(orthodb_dir / "odb11v0_OGs.sqlite")
+    OG2genes_tsv: str = str(orthodb_dir / "odb11v0_OG2genes.tab")
+    OG2genes_sqlite: str = str(orthodb_dir / "odb11v0_OG2genes.sqlite")
+    levels_tsv: str = str(orthodb_dir / "odb11v0_levels.tab")
+    levels2species_tsv: str = str(orthodb_dir / "odb11v0_level2species.tab")
+    species_tsv: str = str(orthodb_dir / "odb11v0_species.tab")
+orthoDB_files = orthoDB_files_object()
+
+# ==============================================================================
+# // data loading functions
+# ==============================================================================
+def load_data_all_odb_seqs():
+    data_all_seqrecords_dict = SeqIO.index_db(
+        str(orthoDB_files.all_seqs_sqlite),
+        str(orthoDB_files.all_seqs_fasta),
+        "fasta",
+    )
+    return data_all_seqrecords_dict
+
 # Below is an attempt to deal with the fact that the orthoDB file names might change with different versions
 # file_wildcards = {
 #     "all_seqs_fasta": "*all_og.fasta",
@@ -68,36 +97,6 @@ orthodb_dir = Path(os.environ['ORTHODB_DATA_DIR'])
 #     species_tsv: str
 
 # orthoDB_files = orthoDB_files_object(**odb_data_files)
-
-# if the above breaks because the filenames completely change, then you can hard code the filepaths here
-@frozen
-class orthoDB_files_object:
-    all_seqs_fasta: str = str(orthodb_dir / "odb11v0_all_og.fasta")
-    all_seqs_sqlite: str = str(orthodb_dir / "odb11v0_all_og.sqlite")
-    gene_refs_tsv: str = str(orthodb_dir / "odb11v0_genes.tab")
-    gene_refs_sqlite: str = str(orthodb_dir / "odb11v0_genes.sqlite")
-    gene_xrefs_tsv = str(orthodb_dir / "odb11v0_gene_xrefs.tab")
-    gene_xrefs_sqlite = str(orthodb_dir / "odb11v0_gene_xrefs.sqlite")
-    ogs_tsv: str = str(orthodb_dir / "odb11v0_OGs.tab")
-    ogs_sqlite: str = str(orthodb_dir / "odb11v0_OGs.sqlite")
-    OG2genes_tsv: str = str(orthodb_dir / "odb11v0_OG2genes.tab")
-    OG2genes_sqlite: str = str(orthodb_dir / "odb11v0_OG2genes.sqlite")
-    levels_tsv: str = str(orthodb_dir / "odb11v0_levels.tab")
-    levels2species_tsv: str = str(orthodb_dir / "odb11v0_level2species.tab")
-    species_tsv: str = str(orthodb_dir / "odb11v0_species.tab")
-orthoDB_files = orthoDB_files_object()
-
-# ==============================================================================
-# // data loading functions
-# ==============================================================================
-def load_data_all_odb_seqs():
-    data_all_seqrecords_dict = SeqIO.index_db(
-        str(orthoDB_files.all_seqs_sqlite),
-        str(orthoDB_files.all_seqs_fasta),
-        "fasta",
-    )
-    return data_all_seqrecords_dict
-
 
 '''
 

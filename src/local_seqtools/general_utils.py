@@ -15,7 +15,6 @@ sys.path.append("/Users/jackson/tools/iupred2a")
 sys.path.append("/home/jackson/tools/iupred2a")
 sys.path.append("/home/jch/tools/iupred2a")
 import iupred2a_lib as iup
-from sklearn import metrics
 
 
 # ==============================================================================
@@ -392,33 +391,6 @@ def get_regex_matches(regex_pattern: str, seq_str: str):
 # ==============================================================================
 # // scores
 # ==============================================================================
-
-
-def precision_recall_curve(
-    true_labels: list[int], scores: list[float]
-) -> tuple[np.array, np.array, np.array, float]:
-    """calculates the precision recall curve from 2 lists. one with the true labels (1 and 0's) and one with measured scores
-
-    Parameters
-    ----------
-    true_labels : list[int]
-        The true labels (1 and 0's)
-    scores : list[float]
-        The measured scores which would be used to predict the labels
-
-    Returns
-    -------
-    tuple[np.array[float], np.array[float], np.array[float], float]
-        a tuple with the `precision`, `recall`, `thresholds` and area under the precision recall curve (`auPRC`)
-    """    
-    assert len(true_labels) == len(scores), "true_labels and scores must be of same length"
-    assert set(true_labels) == {0, 1}, "true_labels must be 0 or 1"
-    precision, recall, thresholds = metrics.precision_recall_curve(
-        np.array(true_labels),
-        np.array(scores),
-    )
-    auPRC = metrics.auc(recall, precision)
-    return precision, recall, thresholds, auPRC
 
 
 def df_2_precision_recall_curve(df: pd.DataFrame, label_col: str, score_col: str) -> tuple[np.array, np.array, np.array, float]:

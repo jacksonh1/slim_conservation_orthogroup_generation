@@ -1,21 +1,16 @@
-import logging
 import multiprocessing
 
 import numpy as np
 import pandas as pd
-from local_orthoDB_tools import database_v6, main_pipeline
-
-logging.basicConfig(filename='./s01_error.log', level=logging.DEBUG, 
-                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
-logging.debug('Start of program')
-logger=logging.getLogger(__name__)
+from local_orthoDB_group_tools import main_pipeline
+from local_orthoDB_group_tools import sql_queries
 
 def multiple_levels(query_geneid):
     params = {
         "main_output_folder": "./orthoDB_analysis_multiprocessed_minfrac-0.75",
         "OG selection method": "level name",
         "min_fraction_short_than_query": "0.75",
-        "LDO selection method": "msa_by_organism",
+        "LDO selection method": "alfpy_google_distance",
         "align": "True",
         "n_align_threads": "6",
         "write files": "True"
@@ -28,18 +23,23 @@ def multiple_levels(query_geneid):
         try:
             main_pipeline.pipeline_setID_directly(query_geneid, user_params=params, linux=False)
         except ValueError as err:
-            logger.error(f"{query_geneid} - {og_level} - {err}")
+            # logger.error(f"{query_geneid} - {og_level} - {err}")
+            print(f"{query_geneid} - {og_level} - {err}")
+
+
+# for k,v in odbdb.data_species_dict.items():
+#     if 'sapiens' in v:
+#         print(k,v)
 
 def main():
-    geneid_list = list(database_v6.orthoDB_query.odb_database.data_geneid_2_og_list_dict.keys())
+    geneid_list = sql_queries.get_all_odbids_from_species_id('9606_0')
+    # geneid_list = ["9606_0:00194d", "9606_0:002f40"]
     # p = multiprocessing.Pool(3)
     # not sure if map is the best choice vs map_async or imap etc...
-    # for this example, just run on a randomly selected 3 genes
     # p.map(multiple_levels, gene_subset)
     # p.close()
     # p.join()
-    gene_subset = np.random.choice(geneid_list, 3)
-    for i in gene_subset:
+    for i in geneid_list:
         multiple_levels(i)
 
 

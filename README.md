@@ -3,8 +3,9 @@
 - [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
   - [comments](#comments)
-- [setup TLDR:](#setup-tldr)
-- [setup:](#setup)
+- [setup TL;DR:](#setup-tldr)
+- [setup (more detailed):](#setup-more-detailed)
+  - [Download this repository](#download-this-repository)
   - [Download orthoDB database files](#download-orthodb-database-files)
   - [conda environment](#conda-environment)
   - [install local tools in environment](#install-local-tools-in-environment)
@@ -46,7 +47,7 @@ The main advantages of using these tools:
         - Imagine you had a group of 100 homologs: 60 from primates with 99 % identity, 20 from other mammals, and 20 distributed across more distant Eukaryotes. The conservation analysis would be dominated by the primates and would not be very informative. The clustering would collapse the 60 primate sequences into one sequence, which would make the analysis more informative.
 
 
-# setup TLDR:
+# setup TL;DR:
 1. download this repository
 2. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
 3. navigate to this downloaded repository in terminal (where this README file is located)
@@ -56,7 +57,12 @@ The main advantages of using these tools:
 7. install the local package: `pip install .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
 
-# setup:
+# setup (more detailed):
+
+## Download this repository
+```bash
+git clone https://github.com/jacksonh1/orthogroup_generation.git
+```
 
 ## Download orthoDB database files
 - download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
@@ -91,7 +97,7 @@ This will also include CD-HIT and MAFFT from bioconda. <br>
 
 ## install local tools in environment
 
-**TLDR**: 
+**TL;DR**: 
 - activate the environment: `conda activate odb_groups_x86`
 - run `pip install .` in this directory (where `setup.py` file is located) <br>
 

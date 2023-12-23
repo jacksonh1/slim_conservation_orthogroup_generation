@@ -1,0 +1,57 @@
+{
+    "json_info_file": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/9606_0:001c7b_Mammalia_info__dict__.json",
+    "output_dir_base": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance",
+    "output_file_dict": {
+        "fasta sequences - full OG": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_full_OG.fasta",
+        "fasta sequences - OG LDOs": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_OG_LDOs.fasta",
+        "fasta sequences - OG LDOs cdhit": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_OG_LDOs_cdhit.fasta",
+        "fasta alignment - OG LDO cdhit": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_OG_LDOs_cdhit_mafftaln.fasta",
+        "json - query and ortho group info": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/9606_0:001c7b_Mammalia_info__dict__.json"
+    },
+    "filter_dict": {
+        "filter - sequences with *s and Xs": {
+            "number of sequences before filtering": 181,
+            "number of sequences removed": 5,
+            "number of sequences after filtering": 176
+        },
+        "filter - sequence length relative to query length": {
+            "min fraction of query sequence length": 0.75,
+            "number of sequences before filtering": 176,
+            "number of sequences removed": 2,
+            "number of sequences after filtering": 174
+        }
+    },
+    "query_gene_id": "9606_0:001c7b",
+    "query_species_id": "9606_0",
+    "query_species_name": "Homo sapiens",
+    "query_ogid_list": [
+        "5821at9604",
+        "5471876at2759",
+        "4349at40674",
+        "1005199at32523",
+        "5821at314295",
+        "605262at9347",
+        "70995at314146",
+        "70995at9443",
+        "1742826at33208",
+        "1567973at7742"
+    ],
+    "selected_query_ogid": "4349at40674",
+    "selected_query_og_level_name": "Mammalia",
+    "selected_query_og_level_ncbi_tax_id": 40674,
+    "selected_query_og_name": "palmitoyl-protein thioesterase 2 ",
+    "query_sequence_str": "MLGLCGQRLPAAWVLLLLPFLPLLLLAAPAPHRASYKPVIVVHGLFDSSYSFRHLLEYINETHPGTVVTVLDLFDGRESLRPLWEQVQGFREAVVPIMAKAPQGVHLICYSQGGLVCRALLSVMDDHNVDSFISLSSPQMGQYGDTDYLKWLFPTSMRSNLYRICYSPWGQEFSICNYWHDPHHDDLYLNASSFLALINGERDHPNATVWRKNFLRVGHLVLIGGPDDGVITPWQSSFFGFYDANETVLEMEEQLVYLRDSFGLKTLLARGAIVRCPMAGISHTAWHSNRTLYETCIEPWLS",
+    "query_sequence_id_str": "Homo_sapiens|9606_0:001c7b",
+    "query_output_dir_path": "orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia",
+    "file_prefix": "Mammalia",
+    "output_file_dict_absolute": {
+        "fasta sequences - full OG": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/orthoDB_construct_groups_for_all_human_genes/orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_full_OG.fasta",
+        "fasta sequences - OG LDOs": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/orthoDB_construct_groups_for_all_human_genes/orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_OG_LDOs.fasta",
+        "fasta sequences - OG LDOs cdhit": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/orthoDB_construct_groups_for_all_human_genes/orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_OG_LDOs_cdhit.fasta",
+        "fasta alignment - OG LDO cdhit": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/orthoDB_construct_groups_for_all_human_genes/orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/Mammalia_OG_LDOs_cdhit_mafftaln.fasta",
+        "json - query and ortho group info": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/orthoDB_construct_groups_for_all_human_genes/orthoDB_analysis_multiprocessed_minfrac-0.75/alfpy_google_distance/9606_0:001c7b/Mammalia/9606_0:001c7b_Mammalia_info__dict__.json"
+    },
+    "num_sequences_full_OG": 174,
+    "num_sequences_LDO": 168,
+    "num_sequences_LDO_cdhit": 33
+}

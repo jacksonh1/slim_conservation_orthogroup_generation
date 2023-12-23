@@ -2,7 +2,7 @@ import copy
 
 import pandas as pd
 
-import local_orthoDB_tools.database_v6 as odb_v6
+import local_orthoDB_group_tools.database as database
 import local_seqtools.alignment_tools as aln_tools
 import local_seqtools.cli_wrappers as cli
 
@@ -105,19 +105,16 @@ def addpid_by_pairwise(df_in, query_sequence, seqrecord_dict):
     seqrecord_list = [seq for seq in seqrecord_dict.values()]
     print("aligning sequences using pairwise alignment")
     df["PID"] = [
-        aln_tools.align_and_get_similarity(
+        aln_tools.align_and_get_PID(
             query_sequence,
             seqrecord,
-            scoring_matrix_name=None,
-            gap_opening_penalty=0,
-            gap_extension_penalty=0,
         )
         for seqrecord in seqrecord_list
     ]
     return df
 
 
-def _wrap_up(df, seqrecord_dict, odbquery: odb_v6.orthoDB_query):
+def _wrap_up(df, seqrecord_dict, odbquery: database.orthoDB_query):
     # remove sequences in the query organism that are not the query sequence
     df = df[(df["organism"] != odbquery.query_species_name.replace(" ", "_")) | (df["id"] == odbquery.query_sequence_id_str)]
     assert odbquery.query_sequence_id_str in df["id"].values, "query sequence not found in df"

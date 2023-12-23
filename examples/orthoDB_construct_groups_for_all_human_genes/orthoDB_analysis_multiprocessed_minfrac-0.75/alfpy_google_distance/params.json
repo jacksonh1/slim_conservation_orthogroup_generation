@@ -1,0 +1,10 @@
+{
+    "main_output_folder": "./orthoDB_analysis_multiprocessed_minfrac-0.75",
+    "OG selection method": "level name",
+    "min_fraction_short_than_query": 0.75,
+    "OG level name": "Vertebrata",
+    "LDO selection method": "alfpy_google_distance",
+    "align": true,
+    "n_align_threads": 6,
+    "write files": true
+}

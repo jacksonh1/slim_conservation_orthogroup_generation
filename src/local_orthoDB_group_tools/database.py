@@ -5,20 +5,20 @@ import pathlib
 import re
 from pathlib import Path
 
-import local_orthoDB_tools_v3.sql_queries as sql_queries
 import pandas as pd
 from Bio import Seq, SeqIO
 from pyprojroot import here
 
 import local_env_variables.env_variables as env
+import local_orthoDB_group_tools.sql_queries as sql_queries
 import local_orthoDB_group_tools.uniprotid_search as uniprotid_search
 
 
 class orthoDB_database:
 
-    database_files = env.orthoDB_files
 
-    def __init__(self):
+    def __init__(self, database_files: env.orthoDB_files_object = env.orthoDB_files):
+        self.database_files = database_files
         self._load_data_all_seqs()
         self._load_data_species_dict()
         self._load_data_levels_df()
@@ -67,6 +67,7 @@ class orthoDB_database:
             ],
         )
 
+    
 
 class orthoDB_query:
     """
@@ -86,73 +87,15 @@ class orthoDB_query:
     # ==============================================================================
     # // helper functions for finding the protein in the database using uniprot id
     # ==============================================================================
-    def _uniprotid_2_geneid_human(self, uniprotid, duplicate_action="longest"):
-        """
-        Given a uniprot id, return the gene id (orthodb id)
-        If multiple gene ids are found, return the `duplicate_action` one (first or longest)
-        """
-        # TODO: switch lookup to SQL query
-        if duplicate_action not in ["first", "longest"]:
-            raise ValueError(
-                f"duplicate_action must be 'first' or 'longest', not {duplicate_action}"
-            )
-        matches = self._search_df(
-            self.odb_database.data_human_gene_key_df, "UniprotID", uniprotid
-        )
-        if matches is None:
-            print(f"{uniprotid} not found in gene key table, searching in xref table")
-            matches = self._search_df(
-                self.odb_database.data_human_xref_gene_key_df, "UniprotID", uniprotid
-            )
-        if matches is None:
-            print("not found in xref key table")
-            raise ValueError(
-                f"Uniprot id `{uniprotid}` not found in human gene key or xref tables"
-            )
-        self.query_uniprot_id = uniprotid
-        self._matches = matches
-        if len(matches) > 1:
-            print(f"Multiple matches for `{uniprotid}` in table")
-            print(matches)
-            print('view matches in "self._matches"')
-            print(f'choosing a single id from multiple matches by "{duplicate_action}"')
-            if duplicate_action == "first":
-                query_gene_id = matches["gene ID"].values[0]
-                self.query_gene_id = query_gene_id
-                return query_gene_id
-            if duplicate_action == "longest":
-                seq_list = []
-                for gene_id in matches["gene ID"].values:
-                    seq = self.odb_database.data_all_seqrecords_dict[gene_id]
-                    seq_list.append(seq)
-                sorted_seq_list = sorted(
-                    seq_list, key=lambda x: len(x.seq), reverse=True
-                )
-                self.duplicate_uniprot_match_seq_str_dict = {i.id: str(i.seq) for i in sorted_seq_list}
-                query_gene_id = sorted_seq_list[0].id
-                self.query_gene_id = query_gene_id
-                return query_gene_id
-        else:
-            query_gene_id = matches["gene ID"].values[0]
-            self.query_gene_id = query_gene_id
-            return query_gene_id
 
     def _get_geneid_info(self, query_gene_id=None):
         if query_gene_id is None:
             query_gene_id = self.query_gene_id
-        gene_info = self.odb_database.data_human_gene_key_df[
-            self.odb_database.data_human_gene_key_df["gene ID"] == query_gene_id
-        ]
-
-        # storing info in class variables
-        self.query_description = gene_info.description.values[0]
-        self.query_species_id = gene_info["species ID"].values[0]
+        self.query_species_id = sql_queries.odb_id_2_species_id(query_gene_id)
         self.query_species_name = self.odb_database.data_species_dict[
             self.query_species_id
         ]
-        self.query_ogid_list = self.odb_database.data_geneid_2_og_list_dict[
-            query_gene_id
-        ]
+        self.query_ogid_list = sql_queries.geneid_2_ogid_list(query_gene_id)
         # if there are no OGs for this gene, raise a ValueError
         if len(self.query_ogid_list) == 0:
             raise ValueError(f"no ortholog groups found for gene id {query_gene_id}")

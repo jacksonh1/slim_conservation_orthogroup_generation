@@ -3,8 +3,8 @@ import os
 
 from pyprojroot import here
 
-from local_orthoDB_tools import (cluster, database_v6, filters, find_LDOs,
-                                 og_select)
+from local_orthoDB_group_tools import (cluster, database, filters, find_LDOs,
+                                       og_select)
 
 root = here()
 default_params_json = root / "src" / "local_orthoDB_tools" / "params.json"
@@ -86,8 +86,8 @@ def pipeline(query_uniprotid, user_params=None, linux=True):
 
     Returns
     -------
-    local_orthoDB_tools.database_v6.orthoDB_query
-        local_orthoDB_tools.database_v6.orthoDB_query object
+    local_orthoDB_tools.database.orthoDB_query
+        local_orthoDB_tools.database.orthoDB_query object
     """
     # TODO: all this default params stuff makes me think I should maybe use argparse or something else
     # could put the params handling in a separate function and call it from here and from the command line
@@ -98,7 +98,7 @@ def pipeline(query_uniprotid, user_params=None, linux=True):
 
     output_folder = os.path.join(params["main_output_folder"], params["LDO selection method"])
 
-    odbquery = database_v6.orthoDB_query(
+    odbquery = database.orthoDB_query(
         output_folder
     )
 
@@ -188,8 +188,8 @@ def pipeline_json_params(query_uniprotid, parameter_file_json=None, linux=True):
 
     Returns
     -------
-    local_orthoDB_tools.database_v6.orthoDB_query
-        local_orthoDB_tools.database_v6.orthoDB_query object
+    local_orthoDB_tools.database.orthoDB_query
+        local_orthoDB_tools.database.orthoDB_query object
     """    
     if parameter_file_json is None:
         print("No parameter file provided, using default parameters")
@@ -251,8 +251,8 @@ def pipeline_setID_directly(odb_gene_id, user_params={}, linux=True):
 
     Returns
     -------
-    local_orthoDB_tools.database_v6.orthoDB_query
-        local_orthoDB_tools.database_v6.orthoDB_query object
+    local_orthoDB_tools.database.orthoDB_query
+        local_orthoDB_tools.database.orthoDB_query object
     """
     # TODO: all this default params stuff makes me think I should maybe use argparse or something else
     # could put the params handling in a separate function and call it from here and from the command line
@@ -261,7 +261,7 @@ def pipeline_setID_directly(odb_gene_id, user_params={}, linux=True):
 
     output_folder = os.path.join(params["main_output_folder"], params["LDO selection method"])
 
-    odbquery = database_v6.orthoDB_query(
+    odbquery = database.orthoDB_query(
         output_folder
     )
 

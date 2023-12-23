@@ -5,20 +5,20 @@ import pathlib
 import re
 from pathlib import Path
 
-import local_orthoDB_tools_v3.sql_queries as sql_queries
+import local_orthoDB_group_tools.sql_queries as sql_queries
 import pandas as pd
 from Bio import Seq, SeqIO
 from Bio.File import _SQLiteManySeqFilesDict
 
 import local_env_variables.env_variables as env
 
-DATA_ALL_SEQRECORDS_DICT = env.load_data_all_seqs()
+DATA_ALL_SEQRECORDS_DICT = env.load_data_all_odb_seqs()
 
 
 def uniprotid_2_geneid(
         uniprotid: str,
-        gene_ref_db_path: str|Path = env.orthoDB_files.gene_refs_full_sqlite,
-        gene_xref_db_path: str|Path = env.orthoDB_files.gene_xrefs_full_sqlite,
+        gene_ref_db_path: str|Path = env.orthoDB_files.gene_refs_sqlite,
+        gene_xref_db_path: str|Path = env.orthoDB_files.gene_xrefs_sqlite,
         data_all_seqrecords_dict: _SQLiteManySeqFilesDict = DATA_ALL_SEQRECORDS_DICT,
         duplicate_action: str = "longest",
     ) -> str:
