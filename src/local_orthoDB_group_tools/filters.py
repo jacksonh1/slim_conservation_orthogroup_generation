@@ -27,9 +27,9 @@ def filter_sequences_with_X(odbquery):
 def filter_sequences_by_length(odbquery, min_fraction_short_than_query=0.5):
     li=len(odbquery.sequences_full_OG_dict)
     filtered_og_seq_dict = {}
-    for gene_id, seq in odbquery.sequences_full_OG_dict.items():
+    for odb_gene_id, seq in odbquery.sequences_full_OG_dict.items():
         if len(seq) >= min_fraction_short_than_query * len(odbquery.query_sequence):
-            filtered_og_seq_dict[gene_id] = seq
+            filtered_og_seq_dict[odb_gene_id] = seq
     lf=len(filtered_og_seq_dict)
     odbquery.filter_dict['filter - sequence length relative to query length'] = {
         'min fraction of query sequence length':min_fraction_short_than_query,

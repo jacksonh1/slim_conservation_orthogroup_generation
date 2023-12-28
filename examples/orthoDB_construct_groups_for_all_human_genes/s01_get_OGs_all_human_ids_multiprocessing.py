@@ -2,8 +2,8 @@ import multiprocessing
 
 import numpy as np
 import pandas as pd
-from local_orthoDB_group_tools import main_pipeline
-from local_orthoDB_group_tools import sql_queries
+from local_orthoDB_group_tools import main_pipeline, sql_queries
+
 
 def multiple_levels(query_geneid):
     params = {

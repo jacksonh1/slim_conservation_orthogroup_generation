@@ -18,7 +18,7 @@ class orthoDB_database:
 
 
     def __init__(self, database_files: env.orthoDB_files_object = env.orthoDB_files):
-        self.database_files = database_files
+        self.datafiles = database_files
         self._load_data_all_seqs()
         self._load_data_species_dict()
         self._load_data_levels_df()
@@ -28,15 +28,15 @@ class orthoDB_database:
     # ==============================================================================
     def _load_data_all_seqs(self):
         self.data_all_seqrecords_dict = SeqIO.index_db(
-            str(self.database_files.all_seqs_sqlite),
-            str(self.database_files.all_seqs_fasta),
+            str(self.datafiles.all_seqs_sqlite),
+            str(self.datafiles.all_seqs_fasta),
             "fasta",
         )
 
     def _load_data_species_dict(self):
         self.data_species_dict = (
             pd.read_csv(
-                self.database_files.species_tsv,
+                self.datafiles.species_tsv,
                 sep="\t",
                 header=None,
                 names=[
@@ -55,7 +55,7 @@ class orthoDB_database:
 
     def _load_data_levels_df(self):
         self.data_levels_df = pd.read_csv(
-            self.database_files.levels_tsv,
+            self.datafiles.levels_tsv,
             sep="\t",
             header=None,
             names=[
@@ -88,18 +88,18 @@ class orthoDB_query:
     # // helper functions for finding the protein in the database using uniprot id
     # ==============================================================================
 
-    def _get_geneid_info(self, query_gene_id=None):
-        if query_gene_id is None:
-            query_gene_id = self.query_gene_id
-        self.query_species_id = sql_queries.odb_id_2_species_id(query_gene_id)
+    def _get_geneid_info(self, query_odb_gene_id=None):
+        if query_odb_gene_id is None:
+            query_odb_gene_id = self.query_odb_gene_id
+        self.query_species_id = sql_queries.odb_gene_id_2_species_id(query_odb_gene_id)
         self.query_species_name = self.odb_database.data_species_dict[
             self.query_species_id
         ]
-        self.query_ogid_list = sql_queries.geneid_2_ogid_list(query_gene_id)
+        self.query_ogid_list = sql_queries.odb_gene_id_2_ogid_list(query_odb_gene_id)
         # if there are no OGs for this gene, raise a ValueError
         if len(self.query_ogid_list) == 0:
-            raise ValueError(f"no ortholog groups found for gene id {query_gene_id}")
-        qseq = self.odb_database.data_all_seqrecords_dict[query_gene_id]
+            raise ValueError(f"no ortholog groups found for gene id {query_odb_gene_id}")
+        qseq = self.odb_database.data_all_seqrecords_dict[query_odb_gene_id]
         self.query_sequence = qseq
         # self.query_sequence_id = str(qseq.id)
 
@@ -141,7 +141,7 @@ class orthoDB_query:
     def driver_set_geneid_by_uniprotid_search(
         self, uniprotid, duplicate_action="longest"
     ):
-        self.query_gene_id = uniprotid_search.uniprotid_2_geneid(uniprotid, duplicate_action=duplicate_action)
+        self.query_odb_gene_id = uniprotid_search.uniprotid_2_geneid(uniprotid, duplicate_action=duplicate_action)
         self.query_uniprot_id = uniprotid
         _ = self._get_geneid_info()
         self._available_OGs_info()
@@ -150,7 +150,7 @@ class orthoDB_query:
         """
         TODO: get UniprotID from gene or xref table. Should probably use SQL query for this
         """
-        self.query_gene_id = geneid
+        self.query_odb_gene_id = geneid
         _ = self._get_geneid_info()
         self._available_OGs_info()
 
@@ -162,13 +162,13 @@ class orthoDB_query:
             if hasattr(self, "query_uniprot_id"):
                 output_dir_path = (
                     self.output_dir_base
-                    / f"{self.query_uniprot_id}-{self.query_gene_id}"
+                    / f"{self.query_uniprot_id}-{self.query_odb_gene_id}"
                     / f"{self.selected_query_og_level_name}"
                 )
             else:
                 output_dir_path = (
                     self.output_dir_base
-                    / f"{self.query_gene_id}"
+                    / f"{self.query_odb_gene_id}"
                     / f"{self.selected_query_og_level_name}"
                 )
         else:
@@ -219,7 +219,7 @@ class orthoDB_query:
         else:
             info_json_filename = (
                 self.query_output_dir_path
-                / f"{self.query_gene_id}_{self.selected_query_og_level_name}_info__dict__.json"
+                / f"{self.query_odb_gene_id}_{self.selected_query_og_level_name}_info__dict__.json"
             )
         self.output_file_dict["json - query and ortho group info"] = info_json_filename
         self.output_file_dict_absolute = {
@@ -265,11 +265,11 @@ class orthoDB_query:
     # // functions to print info to screen
     # ==============================================================================
     def print_database_filepaths(self):
-        for k, v in self.odb_database.database_files.items():
+        for k, v in self.odb_database.datafiles.items():
             print(f"- {k}\n    {v}")
 
     def print_orthoDB_readme(self):
-        with open(self.odb_database.database_files["readme"], "r") as f:
+        with open(self.odb_database.datafiles["readme"], "r") as f:
             print(f.read())
 
     # ==============================================================================

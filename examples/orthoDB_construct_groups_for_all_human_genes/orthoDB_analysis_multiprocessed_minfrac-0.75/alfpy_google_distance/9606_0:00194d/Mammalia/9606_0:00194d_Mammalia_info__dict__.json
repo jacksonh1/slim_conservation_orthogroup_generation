@@ -21,20 +21,20 @@
             "number of sequences after filtering": 174
         }
     },
-    "query_gene_id": "9606_0:00194d",
+    "query_odb_gene_id": "9606_0:00194d",
     "query_species_id": "9606_0",
     "query_species_name": "Homo sapiens",
     "query_ogid_list": [
         "5821at9604",
-        "5471876at2759",
+        "70995at9443",
         "4349at40674",
+        "1567973at7742",
         "1005199at32523",
+        "5471876at2759",
         "5821at314295",
         "605262at9347",
-        "70995at314146",
-        "70995at9443",
         "1742826at33208",
-        "1567973at7742"
+        "70995at314146"
     ],
     "selected_query_ogid": "4349at40674",
     "selected_query_og_level_name": "Mammalia",

@@ -8,6 +8,7 @@ development/
 workspace.code-workspace
 .vscode/
 plan.md
+*.sqlite
 
 
 *.pyc

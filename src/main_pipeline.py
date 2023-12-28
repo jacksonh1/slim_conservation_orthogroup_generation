@@ -1,6 +1,7 @@
 import json
 import os
 
+from attrs import define, field
 from pyprojroot import here
 
 from local_orthoDB_group_tools import (cluster, database, filters, find_LDOs,
@@ -18,6 +19,21 @@ DEFAULT_PARAM_DICT = {
     "n_align_threads": 32,
     "write files": True
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def str2bool(s: str):
     if s == 'True':

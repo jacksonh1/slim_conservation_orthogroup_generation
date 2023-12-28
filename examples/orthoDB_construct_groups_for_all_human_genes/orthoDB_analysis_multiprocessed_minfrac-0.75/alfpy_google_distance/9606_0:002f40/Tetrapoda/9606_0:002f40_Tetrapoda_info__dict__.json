@@ -21,20 +21,20 @@
             "number of sequences after filtering": 170
         }
     },
-    "query_gene_id": "9606_0:002f40",
+    "query_odb_gene_id": "9606_0:002f40",
     "query_species_id": "9606_0",
     "query_species_name": "Homo sapiens",
     "query_ogid_list": [
-        "869863at7742",
-        "96736at9443",
-        "21856at40674",
-        "1771281at33208",
-        "18706at314295",
-        "18706at9604",
-        "96736at314146",
-        "622381at9347",
         "4642869at2759",
-        "351562at32523"
+        "18706at9604",
+        "21856at40674",
+        "96736at314146",
+        "351562at32523",
+        "622381at9347",
+        "869863at7742",
+        "18706at314295",
+        "96736at9443",
+        "1771281at33208"
     ],
     "selected_query_ogid": "351562at32523",
     "selected_query_og_level_name": "Tetrapoda",

@@ -49,8 +49,8 @@ def cdhit_minidriver(odbquery, seqrecords_2_cluster_list, linux=True, repr_id_ke
 
     if repr_id_keywords is None:
         repr_id_keywords = []
-    if hasattr(odbquery, "query_gene_id"):
-        repr_id_keywords.append(odbquery.query_gene_id)
+    if hasattr(odbquery, "query_odb_gene_id"):
+        repr_id_keywords.append(odbquery.query_odb_gene_id)
 
     _, cdhit_clstr_dict = cli.cd_hit_wrapper(seqrecords_2_cluster_list, output_type="dict", linux=linux)
     cdhit_clstr_dict=cdhit_tools.cd_hit_clstr_redefine_cluster_representative_by_keywords(

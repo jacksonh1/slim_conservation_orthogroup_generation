@@ -15,7 +15,7 @@ sqltools.create_sqlitedb_from_csv(
     csv_file_name = env.orthoDB_files.gene_refs_tsv,
     table_name = 'gene_refs',
     column_names = [
-        'gene_id',
+        'odb_gene_id',
         'species_id',
         'source_id',
         'synonyms',
@@ -24,7 +24,7 @@ sqltools.create_sqlitedb_from_csv(
         'NCBI_id',
         'description',
     ],
-    index_column_name=['gene_id', 'Uniprotid']
+    index_column_name=['odb_gene_id', 'Uniprotid']
 )
 
 connection.close()
