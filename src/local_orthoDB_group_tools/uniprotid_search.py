@@ -2,7 +2,7 @@ import local_env_variables.env_variables as env
 import local_orthoDB_group_tools.sql_queries as sql_queries
 
 
-def uniprotid_2_geneid(
+def uniprotid_2_odb_gene_id(
         uniprotid: str,
         duplicate_action: str = "longest",
     ) -> str:

@@ -15,59 +15,20 @@ import local_orthoDB_group_tools.uniprotid_search as uniprotid_search
 
 
 class orthoDB_database:
-
-
     def __init__(self, database_files: env.orthoDB_files_object = env.orthoDB_files):
         self.datafiles = database_files
-        self._load_data_all_seqs()
+        self.data_all_seqrecords_dict = env.load_data_all_odb_seqs(self.datafiles)
+        self.data_levels_df = env.load_data_levels_df(self.datafiles)
         self._load_data_species_dict()
-        self._load_data_levels_df()
-
-    # ==============================================================================
-    # // DATA LOADING METHODS
-    # ==============================================================================
-    def _load_data_all_seqs(self):
-        self.data_all_seqrecords_dict = SeqIO.index_db(
-            str(self.datafiles.all_seqs_sqlite),
-            str(self.datafiles.all_seqs_fasta),
-            "fasta",
-        )
 
     def _load_data_species_dict(self):
         self.data_species_dict = (
-            pd.read_csv(
-                self.datafiles.species_tsv,
-                sep="\t",
-                header=None,
-                names=[
-                    "NCBI id",
-                    "species ID",
-                    "species name",
-                    "assembly ID",
-                    "n clustered genes",
-                    "n OGs",
-                    "mapping type",
-                ],
-            )[["species ID", "species name"]]
+            env.load_data_species_df(self.datafiles)[["species ID", "species name"]]
             .set_index("species ID")
             .to_dict()["species name"]
         )
 
-    def _load_data_levels_df(self):
-        self.data_levels_df = pd.read_csv(
-            self.datafiles.levels_tsv,
-            sep="\t",
-            header=None,
-            names=[
-                "level NCBI tax id",
-                "level name",
-                "total non-redundant count of genes in all underneath clustered species",
-                "total count of OGs built on it",
-                "total non-redundant count of species underneath",
-            ],
-        )
 
-    
 
 class orthoDB_query:
     """
@@ -98,7 +59,9 @@ class orthoDB_query:
         self.query_ogid_list = sql_queries.odb_gene_id_2_ogid_list(query_odb_gene_id)
         # if there are no OGs for this gene, raise a ValueError
         if len(self.query_ogid_list) == 0:
-            raise ValueError(f"no ortholog groups found for gene id {query_odb_gene_id}")
+            raise ValueError(
+                f"no ortholog groups found for gene id {query_odb_gene_id}"
+            )
         qseq = self.odb_database.data_all_seqrecords_dict[query_odb_gene_id]
         self.query_sequence = qseq
         # self.query_sequence_id = str(qseq.id)
@@ -141,7 +104,9 @@ class orthoDB_query:
     def driver_set_geneid_by_uniprotid_search(
         self, uniprotid, duplicate_action="longest"
     ):
-        self.query_odb_gene_id = uniprotid_search.uniprotid_2_geneid(uniprotid, duplicate_action=duplicate_action)
+        self.query_odb_gene_id = uniprotid_search.uniprotid_2_odb_gene_id(
+            uniprotid, duplicate_action=duplicate_action
+        )
         self.query_uniprot_id = uniprotid
         _ = self._get_geneid_info()
         self._available_OGs_info()

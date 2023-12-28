@@ -32,18 +32,74 @@ class orthoDB_files_object:
     levels_tsv: str = str(orthodb_dir / "odb11v0_levels.tab")
     levels2species_tsv: str = str(orthodb_dir / "odb11v0_level2species.tab")
     species_tsv: str = str(orthodb_dir / "odb11v0_species.tab")
+
 orthoDB_files = orthoDB_files_object()
 
 # ==============================================================================
 # // data loading functions
 # ==============================================================================
-def load_data_all_odb_seqs():
+def load_data_all_odb_seqs(database_files: orthoDB_files_object = orthoDB_files):
     data_all_seqrecords_dict = SeqIO.index_db(
-        str(orthoDB_files.all_seqs_sqlite),
-        str(orthoDB_files.all_seqs_fasta),
+        str(database_files.all_seqs_sqlite),
+        str(database_files.all_seqs_fasta),
         "fasta",
     )
     return data_all_seqrecords_dict
+
+
+def load_data_species_df(database_files: orthoDB_files_object = orthoDB_files):
+    species_df = pd.read_csv(
+        database_files.species_tsv,
+        sep="\t",
+        header=None,
+        names=[
+            "NCBI id",
+            "species ID",
+            "species name",
+            "assembly ID",
+            "n clustered genes",
+            "n OGs",
+            "mapping type",
+        ],
+    )
+    return species_df
+
+def load_data_levels_df(database_files: orthoDB_files_object = orthoDB_files):
+    levels_df = pd.read_csv(
+        database_files.levels_tsv,
+        sep="\t",
+        header=None,
+        names=[
+            "level NCBI tax id",
+            "level name",
+            "total non-redundant count of genes in all underneath clustered species",
+            "total count of OGs built on it",
+            "total non-redundant count of species underneath",
+        ],
+    )
+    return levels_df
+
+
+class orthoDB_database:
+    '''
+    main class that holds the orthoDB data
+    '''    
+
+    def __init__(self, database_files: orthoDB_files_object = orthoDB_files):
+        self.datafiles = database_files
+        self.data_all_seqrecords_dict = load_data_all_odb_seqs(self.datafiles)
+        self.data_levels_df = load_data_levels_df(self.datafiles)
+        self.data_species_df = load_data_species_df(self.datafiles)
+        self._load_data_species_dict()
+
+    def _load_data_species_dict(self):
+        self.data_species_dict = (
+            load_data_species_df(self.datafiles)[["species ID", "species name"]]
+            .set_index("species ID")
+            .to_dict()["species name"]
+        )
+
+odb_database = orthoDB_database()
 
 # Below is an attempt to deal with the fact that the orthoDB file names might change with different versions
 # file_wildcards = {

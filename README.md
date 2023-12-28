@@ -11,6 +11,8 @@
   - [install local tools in environment](#install-local-tools-in-environment)
   - [generate SQLite databases for orthoDB files](#generate-sqlite-databases-for-orthodb-files)
 - [Usage](#usage)
+- [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data)
+- [pipeline](#pipeline)
 - [Parameters](#parameters)
   - [alignment](#alignment)
 
@@ -134,8 +136,46 @@ There are two main ways to use this pipeline: <br>
 
 example for choosing levels: https://www.orthodb.org/?query=pcare
 
+# brief explanation of the orthoDB data
+You can view the readme file that comes with the orthoDB download for more information. <br>
+The data is organized using some internal id numbers. <br>
+Here is a brief explanation of the ids and how I've refered to them in the code.
+- **odb_gene_id**: An internal orthoDB id. It defines a specific protein sequence in the database. The sequences in the fasta file have the orthoDB id as the sequence id. It is not consistent across versions of orthoDB.
+  - example: `9606_0:001c7b`
+  - odb_gene_id's are mapped to a variety of other ids corresponding to outside databases (e.g. uniprot, ensembl, etc.) or they were downloaded from some database and have a corresponding id. This information is stored in the `odb11v0_gene_xrefs.tab`/`odb11v0_genes.tab` files.
+- **og_id**: An internal orthoDB id. It is probably not consistent across versions of orthoDB. It defines a group of homologous sequences. Each phylogenetic level of homologs has a unique og_id. So a single odb_gene_id probably belongs to multiple og_ids.
+  - example og_id: `1567973at7742`
+  - example - all of the og_id's that contain the odb_gene_id `9606_0:001c7b`:
+    - `605262at9347`, `70995at314146`, `5821at9604`, `1742826at33208`, `5821at314295`, `4349at40674`, `1005199at32523`, `1567973at7742`, `5471876at2759`, `70995at9443`
+  - Each of the og_id's is associated with a phylogenetic level at which it was constructed:
+      | OG id          | level name       |   total non-redundant count of species underneath |
+      |:---------------|:-----------------|--------------------------------------------------:|
+      | 5471876at2759  | Eukaryota        |                                              1952 |
+      | 1742826at33208 | Metazoa          |                                               817 |
+      | 1567973at7742  | Vertebrata       |                                               470 |
+      | 1005199at32523 | Tetrapoda        |                                               325 |
+      | 4349at40674    | Mammalia         |                                               191 |
+      | 605262at9347   | Eutheria         |                                               182 |
+      | 70995at314146  | Euarchontoglires |                                                70 |
+      | 70995at9443    | Primates         |                                                30 |
+      | 5821at314295   | Hominoidea       |                                                 7 |
+      | 5821at9604     | Hominidae        |                                                 5 |
+      - These correspond with the groups on the website: https://www.orthodb.org/?query=9606_0%3A001c7b
+
+
+# pipeline
+- To see the pipeline for a single query protein, see`./examples/orthogroup_generation_for_single_protein.ipynb`
+
 
 # Parameters
 
 ## alignment
 you can use your own alignment program by changing the `ALIGNER_EXECUTABLE` variable in the `.env` file
+
+
+
+Notes:
+This pipeline could probably benefit from using a workflow manager like snakemake or nextflow. However, I'm not sure if it would be worth the extra effort required for people to understand if they are unfamiliar with those tools. 
+I've considered using a config manager like hydra, but it has the same potential downfall. 
+
+

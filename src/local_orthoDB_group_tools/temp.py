@@ -1,5 +1,6 @@
 import pandas as pd
 
+import local_env_variables.env_variables as env
 import local_orthoDB_group_tools.sql_queries as sql_queries
 
 query_ogid_list = sql_queries.odb_gene_id_2_ogid_list(odb_gene_id)
