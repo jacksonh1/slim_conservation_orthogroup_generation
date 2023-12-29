@@ -1,7 +1,9 @@
+from pathlib import Path
+
 import local_seqtools.cli_wrappers as cli
 
 
-def cd_hit_clstr_parser(clstr_filepath):
+def cd_hit_clstr_parser(clstr_filepath: str|Path) -> dict[str, dict[str, list[str]]]:
     '''
     returns dictionary of cluster names and their members
     the dictionary will have two keys for each cluster:

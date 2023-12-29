@@ -1,3 +1,4 @@
+import copy
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,6 +13,10 @@ from Bio import Seq, SeqIO
 dotenv.load_dotenv()
 # dotenv.find_dotenv()
 orthodb_dir = Path(os.environ['ORTHODB_DATA_DIR'])
+MAFFT_EXECUTABLE = os.environ['MAFFT_EXECUTABLE']
+MAFFT_ADDITIONAL_ARGUMENTS = os.environ['MAFFT_ADDITIONAL_ARGUMENTS']
+CD_HIT_EXECUTABLE = os.environ['CD_HIT_EXECUTABLE']
+CD_HIT_ADDITIONAL_ARGUMENTS = os.environ['CD_HIT_ADDITIONAL_ARGUMENTS']
 
 # ==============================================================================
 # // getting odb filepaths
@@ -90,15 +95,32 @@ class orthoDB_database:
         self.data_all_seqrecords_dict = load_data_all_odb_seqs(self.datafiles)
         self.data_levels_df = load_data_levels_df(self.datafiles)
         self.data_species_df = load_data_species_df(self.datafiles)
-        self._load_data_species_dict()
+        # special dictionaries that I want to have available for quick lookup
+        self.data_species_dict = self._load_data_species_dict()
+        self.data_levels_taxid_name_dict = self._load_data_levels_taxid_name_dict()
 
     def _load_data_species_dict(self):
-        self.data_species_dict = (
-            load_data_species_df(self.datafiles)[["species ID", "species name"]]
+        return (
+            self.data_species_df[["species ID", "species name"]]
             .set_index("species ID")
             .to_dict()["species name"]
         )
 
+    def _load_data_levels_taxid_name_dict(self):
+        return (
+            self.data_levels_df[["level NCBI tax id", "level name"]]
+            .set_index("level NCBI tax id")
+            .to_dict()["level name"]
+        )
+
+    def get_sequences_from_list_of_seq_ids(self, sequence_ids: list[str]) -> dict[str, Seq.Seq]:
+        og_seq_dict = {}
+        for odb_gene_id in sequence_ids:
+            og_seq_dict[odb_gene_id] = self.data_all_seqrecords_dict[odb_gene_id]
+        return copy.deepcopy(og_seq_dict)
+
+
+# make the orthoDB_database object available as a global environment variable
 odb_database = orthoDB_database()
 
 # Below is an attempt to deal with the fact that the orthoDB file names might change with different versions

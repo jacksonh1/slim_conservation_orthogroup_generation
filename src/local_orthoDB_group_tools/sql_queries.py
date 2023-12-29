@@ -69,56 +69,21 @@ def odb_gene_id_2_ogid_list(odb_gene_id, db_path: str|Path = env.orthoDB_files.O
     return og_ids
 
 
-def ogid_list_2_og_df(ogid_list: list[str], db_path: str|Path = env.orthoDB_files.ogs_sqlite) -> pd.DataFrame:
-    db_path = env.orthoDB_files.ogs_sqlite
+def get_ogid_info(ogid, db_path: str|Path = env.orthoDB_files.ogs_sqlite) -> tuple[str]:
+    """query the OGs sqlite database for the info about the OG with the given ogid
+
+    Returns
+    -------
+    tuple[str]
+        returns a tuple composed of (ogid, level NCBI tax id, and OG name)
+    """        
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
-    # og_df = pd.DataFrame.f
-    og_query_results = []
-    for og_id in ogid_list:
-        # res = cursor.execute(f"SELECT species_id FROM genes WHERE odb_gene_id='{seqrecord.id.split('|')[1]}'")
-        res = cursor.execute(f"SELECT * FROM OGs WHERE OG_id='{og_id}'")
-        og_query_results.append(res.fetchall()[0])
-
+    res = cursor.execute(f"SELECT * FROM OGs WHERE OG_id='{ogid}'")
+    og_info = res.fetchall()[0]
+    # raise error if no results found?
     connection.close()
-    og_df=pd.DataFrame.from_records(og_query_results, columns=['index', 'OG id', "level NCBI tax id", "OG name"])
-    og_df = og_df.drop('index', axis=1)
-    og_df['level NCBI tax id'] = og_df['level NCBI tax id'].astype(int)
-    return og_df
-
-            
-def ogid_list_2_og_info_df(ogid_list: list[str], odb_database: env.orthoDB_database = env.odb_database) -> pd.DataFrame:
-    """get info about the list of OGs available for the selected geneid"""
-    query_og_df = ogid_list_2_og_df(ogid_list, odb_database.datafiles.ogs_sqlite)
-    query_level_df = odb_database.data_levels_df[
-        odb_database.data_levels_df["level NCBI tax id"].isin(
-            query_og_df["level NCBI tax id"].unique()
-        )
-    ].copy()
-    query_available_OGs_info_df = pd.merge(
-        query_og_df, query_level_df, on="level NCBI tax id", how="inner"
-    )
-    query_available_OGs_info_df = query_available_OGs_info_df[
-        [
-            "OG id",
-            "level NCBI tax id",
-            "level name",
-            "total non-redundant count of species underneath",
-            "OG name",
-        ]
-    ]
-    query_available_OGs_info_df[
-        "total non-redundant count of species underneath"
-    ] = query_available_OGs_info_df[
-        "total non-redundant count of species underneath"
-    ].astype(
-        float
-    )
-    # query_OG_info_df = query_OG_info_df.infer_objects()
-    query_available_OGs_info_df = query_available_OGs_info_df.sort_values(
-        by="total non-redundant count of species underneath"
-    )
-    return query_available_OGs_info_df
+    return og_info[1:]
 
 
 def odb_gene_id_2_uniprotid(odb_gene_id, db_path: str|Path = env.orthoDB_files.gene_refs_sqlite) -> str:

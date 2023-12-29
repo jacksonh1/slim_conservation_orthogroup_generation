@@ -7,21 +7,19 @@ from pathlib import Path
 
 from Bio import Align, AlignIO, Seq, SeqIO
 
+import local_env_variables.env_variables as env
 import local_seqtools.cdhit_tools as cdhit_tools
 import local_seqtools.general_utils as tools
 
-"""
-functions that end with `_command` return a string that can be used as a command line argument
-functions that end with wrapper: 
-- run the command line argument
-- generate temporary files
-- return the output
-- then delete the temporary files
-"""
 
 def mafft_align_wrapper(
-    input_seqrecord_list, output_type="list", fast=False, n_align_threads=8
-):
+    input_seqrecord_list: list[SeqIO.SeqRecord],
+    mafft_executable: str = env.MAFFT_EXECUTABLE,
+    extra_args: str = env.MAFFT_ADDITIONAL_ARGUMENTS,
+    output_type: str = "list",
+    fast: bool = False,
+    n_align_threads: int = 8,
+) -> list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord] | AlignIO.MultipleSeqAlignment:
     assert output_type in [
         "list",
         "dict",
@@ -38,11 +36,9 @@ def mafft_align_wrapper(
     if os.path.exists(alignment_filename):
         raise FileExistsError(f"{alignment_filename} already exists")
     if fast:
-        mafft_command = f'mafft --thread {n_align_threads} --quiet --retree 1 "{temp_file.name}" > "{alignment_filename}"'
+        mafft_command = f'mafft --thread {n_align_threads} --quiet --retree 1 {extra_args} "{temp_file.name}" > "{alignment_filename}"'
     else:
-        mafft_command = (
-            f'mafft --thread {n_align_threads} --quiet --anysymbol "{temp_file.name}" > "{alignment_filename}"'
-        )
+        mafft_command = f'mafft --thread {n_align_threads} --quiet --anysymbol {extra_args} "{temp_file.name}" > "{alignment_filename}"'
     # print(mafft_command)
     subprocess.run(mafft_command, shell=True, check=True)
     # read in mafft output
@@ -56,6 +52,48 @@ def mafft_align_wrapper(
     os.remove(alignment_filename)
     os.remove(temp_file.name)
     return mafft_output
+
+
+def cd_hit_wrapper(
+    input_seqrecord_list: list[SeqIO.SeqRecord],
+    cd_hit_executable: str = env.CD_HIT_EXECUTABLE,
+    extra_args: str = env.CD_HIT_ADDITIONAL_ARGUMENTS,
+    output_type="list",
+) -> list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord]:
+    assert output_type in [
+        "list",
+        "dict",
+    ], f'`output_type` must be one of ["list", "dict"]'
+
+    # create temporary file
+    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
+    # write seqrecords to temporary file
+    SeqIO.write(input_seqrecord_list, temp_file, "fasta")
+    temp_file.close()
+    clustered_seqs_filename = f"{temp_file.name}-cdhit.fa"
+    # raise an error if the alignment file already exists. (it won't but just in case)
+    if os.path.exists(clustered_seqs_filename):
+        raise FileExistsError(f"{clustered_seqs_filename} already exists")
+
+    clustered_seqs_clusters_filename = clustered_seqs_filename + ".clstr"
+    command = f"{cd_hit_executable} -i {temp_file.name} -o {clustered_seqs_filename} -M 0 -d 0 {extra_args}"
+    subprocess.run(command, shell=True, check=True)
+
+    output_clstrs_dict = cdhit_tools.cd_hit_clstr_parser(
+        clustered_seqs_clusters_filename
+    )
+
+    # read in clustal output
+    if output_type == "list":
+        output = tools.import_fasta(clustered_seqs_filename, output_format="list")
+    elif output_type == "dict":
+        output = tools.import_fasta(clustered_seqs_filename, output_format="dict")
+    # delete temporary file
+    os.remove(clustered_seqs_filename)
+    os.remove(clustered_seqs_clusters_filename)
+    os.remove(temp_file.name)
+    return output, output_clstrs_dict
+
 
 
 def clustal_align_wrapper(
@@ -98,54 +136,17 @@ def clustal_align_wrapper(
     os.remove(temp_file.name)
     return clustal_output
 
-
-def cd_hit_wrapper(input_seqrecord_list, output_type="list", linux=False, extra_args=""):
-    assert output_type in [
-        "list",
-        "dict",
-    ], f'`output_type` must be one of ["list", "dict"]'
-
-    # create temporary file
-    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
-    # write seqrecords to temporary file
-    SeqIO.write(input_seqrecord_list, temp_file, "fasta")
-    temp_file.close()
-    clustered_seqs_filename = f"{temp_file.name}-cdhit.fa"
-    # raise an error if the alignment file already exists. (it won't but just in case)
-    if os.path.exists(clustered_seqs_filename):
-        raise FileExistsError(f"{clustered_seqs_filename} already exists")
-
-    clustered_seqs_clusters_filename = clustered_seqs_filename + ".clstr"
-    if linux:
-        command = (
-            f"cd-hit -i {temp_file.name} -o {clustered_seqs_filename} -M 0 -d 0 {extra_args}"
-        )
-    else:
-        command = f"/Users/jackson/mambaforge/envs/cd_hit_x86/bin/cd-hit -i {temp_file.name} -o {clustered_seqs_filename} -M 0 -d 0 {extra_args}"
-    subprocess.run(command, shell=True, check=True)
-
-    output_clstrs_dict = cdhit_tools.cd_hit_clstr_parser(clustered_seqs_clusters_filename)
-
-    # read in clustal output
-    if output_type == "list":
-        output = tools.import_fasta(clustered_seqs_filename, output_format="list")
-    elif output_type == "dict":
-        output = tools.import_fasta(clustered_seqs_filename, output_format="dict")
-    # delete temporary file
-    os.remove(clustered_seqs_filename)
-    os.remove(clustered_seqs_clusters_filename)
-    os.remove(temp_file.name)
-    return output, output_clstrs_dict
-
-
-def muscle_align_wrapper(input_seqrecord_list, output_type="list"):
+        
+def muscle_align_wrapper(
+    input_seqrecord_list: list[SeqIO.SeqRecord],
+    muscle_binary: str = "/Users/jackson/tools/muscle/muscle-5.1.0/src/Darwin/muscle",
+    output_type:str = "list"
+) -> list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord] | AlignIO.MultipleSeqAlignment:
     assert output_type in [
         "list",
         "dict",
         "alignment",
     ], f'`output_type` must be one of ["list", "dict", "alignment"]'
-
-    muscle_binary = "/Users/jackson/tools/muscle/muscle-5.1.0/src/Darwin/muscle"
 
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
     SeqIO.write(input_seqrecord_list, temp_file, "fasta")
@@ -171,4 +172,3 @@ def muscle_align_wrapper(input_seqrecord_list, output_type="list"):
     os.remove(alignment_filename)
     os.remove(temp_file.name)
     return muscle_output
-
