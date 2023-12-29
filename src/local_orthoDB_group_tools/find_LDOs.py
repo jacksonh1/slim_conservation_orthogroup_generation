@@ -171,4 +171,4 @@ def find_LDOs_main(
             fast_msa=fast_msa,
             n_align_threads=n_align_threads,
         )
-    return get_LDOs_from_pids(df, query_seqrecord)
+    return df, get_LDOs_from_pids(df, query_seqrecord)
