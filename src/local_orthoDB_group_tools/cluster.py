@@ -8,7 +8,7 @@ import local_seqtools.cli_wrappers as cli
 
 
 def cdhit_clstr_retrieve_representative_sequences(
-    clstr_dict: dict[str, str], seqrecord_dict: dict[str, SeqIO.SeqRecord]
+    clstr_dict: dict[str, dict[str, str]], seqrecord_dict: dict[str, SeqIO.SeqRecord]
 ) -> dict[str, SeqIO.SeqRecord]:
     """
     pull out representative seqs defined in cdhit clstr_dict from full seqrecord_dict
@@ -23,17 +23,18 @@ def cdhit_clstr_retrieve_representative_sequences(
 
 def cdhit_main(
     seqrecord_dict: dict[str, SeqIO.SeqRecord],
-    query_seqrecord: SeqIO.SeqRecord,
+    query_odb_gene_id: str,
     repr_id_keywords: list[str] | None = None,
-) -> dict[str, SeqIO.SeqRecord]:
+    **kwargs,
+) -> tuple[str, dict[str, SeqIO.SeqRecord]]:
     """ """
     if repr_id_keywords is None:
         repr_id_keywords = []
-    if query_seqrecord.id not in repr_id_keywords:
-        repr_id_keywords.append(query_seqrecord.id)
+    if query_odb_gene_id not in repr_id_keywords:
+        repr_id_keywords.append(query_odb_gene_id)
 
-    _, cdhit_clstr_dict = cli.cd_hit_wrapper(
-        list(seqrecord_dict.values()), output_type="dict"
+    cdhit_command, _, cdhit_clstr_dict = cli.cd_hit_wrapper(
+        list(seqrecord_dict.values()), output_type="dict", **kwargs
     )
     cdhit_clstr_dict = (
         cdhit_tools.cd_hit_clstr_redefine_cluster_representative_by_keywords(
@@ -44,4 +45,4 @@ def cdhit_main(
     clustered_seqrecord_dict = cdhit_clstr_retrieve_representative_sequences(
         cdhit_clstr_dict, seqrecord_dict
     )
-    return clustered_seqrecord_dict
+    return cdhit_command, clustered_seqrecord_dict

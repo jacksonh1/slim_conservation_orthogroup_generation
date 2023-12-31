@@ -7,7 +7,7 @@ import dotenv
 import pandas as pd
 # from attrs import define, field
 from attrs import frozen
-from Bio import Seq, SeqIO
+from Bio import SeqIO
 
 # from pyprojroot import here
 dotenv.load_dotenv()
@@ -113,7 +113,7 @@ class orthoDB_database:
             .to_dict()["level name"]
         )
 
-    def get_sequences_from_list_of_seq_ids(self, sequence_ids: list[str]) -> dict[str, Seq.Seq]:
+    def get_sequences_from_list_of_seq_ids(self, sequence_ids: list[str]) -> dict[str, SeqIO.SeqRecord]:
         og_seq_dict = {}
         for odb_gene_id in sequence_ids:
             og_seq_dict[odb_gene_id] = self.data_all_seqrecords_dict[odb_gene_id]

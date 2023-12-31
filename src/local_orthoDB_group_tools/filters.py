@@ -27,7 +27,7 @@ def filter_seqs_with_nonaa_chars(
 
 def filter_shorter_sequences(
     seqrecord_dict: dict[str, SeqIO.SeqRecord],
-    min_length: int,
+    min_length: int|float,
 ) -> dict[str, SeqIO.SeqRecord]:
     filtered_og_seq_dict = {}
     for seq_id, seq in seqrecord_dict.items():

@@ -19,7 +19,7 @@ def mafft_align_wrapper(
     output_type: str = "list",
     fast: bool = False,
     n_align_threads: int = 8,
-) -> list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord] | AlignIO.MultipleSeqAlignment:
+) -> tuple[str, list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord] | AlignIO.MultipleSeqAlignment]:
     assert output_type in [
         "list",
         "dict",
@@ -36,9 +36,9 @@ def mafft_align_wrapper(
     if os.path.exists(alignment_filename):
         raise FileExistsError(f"{alignment_filename} already exists")
     if fast:
-        mafft_command = f'mafft --thread {n_align_threads} --quiet --retree 1 {extra_args} "{temp_file.name}" > "{alignment_filename}"'
+        mafft_command = f'{mafft_executable} --thread {n_align_threads} --quiet --retree 1 {extra_args} "{temp_file.name}" > "{alignment_filename}"'
     else:
-        mafft_command = f'mafft --thread {n_align_threads} --quiet --anysymbol {extra_args} "{temp_file.name}" > "{alignment_filename}"'
+        mafft_command = f'{mafft_executable} --thread {n_align_threads} --quiet --anysymbol {extra_args} "{temp_file.name}" > "{alignment_filename}"'
     # print(mafft_command)
     subprocess.run(mafft_command, shell=True, check=True)
     # read in mafft output
@@ -51,7 +51,7 @@ def mafft_align_wrapper(
     # delete temporary file
     os.remove(alignment_filename)
     os.remove(temp_file.name)
-    return mafft_output
+    return mafft_command, mafft_output
 
 
 def cd_hit_wrapper(
@@ -59,7 +59,7 @@ def cd_hit_wrapper(
     cd_hit_executable: str = env.CD_HIT_EXECUTABLE,
     extra_args: str = env.CD_HIT_ADDITIONAL_ARGUMENTS,
     output_type="list",
-) -> list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord]:
+) -> tuple[str, list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord], dict[str, dict[str, str]]]:
     assert output_type in [
         "list",
         "dict",
@@ -92,7 +92,7 @@ def cd_hit_wrapper(
     os.remove(clustered_seqs_filename)
     os.remove(clustered_seqs_clusters_filename)
     os.remove(temp_file.name)
-    return output, output_clstrs_dict
+    return command, output, output_clstrs_dict
 
 
 

@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from Bio import SeqIO
 
-import local_orthoDB_group_tools.database as database
 import local_orthoDB_group_tools.sql_queries as sql_queries
 import local_seqtools.alignment_tools as aln_tools
 import local_seqtools.cli_wrappers as cli
@@ -41,7 +40,7 @@ def addpid_by_msa(
 ) -> pd.DataFrame:
     df = df_in.copy()
     seqrecord_list = [seq for seq in seqrecord_dict.values()]
-    msa_seqrecord_list = cli.mafft_align_wrapper(
+    _, msa_seqrecord_list = cli.mafft_align_wrapper(
         seqrecord_list, fast=fast_msa, n_align_threads=n_align_threads
     )
     query_msa_seqrecord = [i for i in msa_seqrecord_list if i.id == query_seqrecord.id][
@@ -75,7 +74,7 @@ def addpid_by_msa_by_organism(
         if query_seqrecord.id not in [seq.id for seq in seqs]:
             seqs.append(query_seqrecord)
         # align the sequences
-        msa_i_dict = cli.mafft_align_wrapper(
+        _, msa_i_dict = cli.mafft_align_wrapper(
             seqs, output_type="dict", fast=fast_msa, n_align_threads=n_align_threads
         )
         # compute the pairwise percent identity from the MSA
@@ -147,7 +146,7 @@ def find_LDOs_main(
     pid_method: str = "alfpy_google_distance",
     fast_msa: bool = False,
     n_align_threads: int = 8,
-) -> list[str]:
+) -> tuple[pd.DataFrame, list[str]]:
     assert pid_method in [
         "msa_by_organism",
         "alfpy_google_distance",

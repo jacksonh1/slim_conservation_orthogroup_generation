@@ -1,21 +1,9 @@
-import copy
-import json
-import os
-import pathlib
-import re
-from pathlib import Path
 
 import pandas as pd
-from Bio import Seq, SeqIO
-from pyprojroot import here
 
 import local_env_variables.env_variables as env
 import local_orthoDB_group_tools.sql_queries as sql_queries
-import local_orthoDB_group_tools.uniprotid_search as uniprotid_search
 
-# ==============================================================================
-# // ogid selection
-# ==============================================================================
 
 def _ogid_list_2_og_info_df(ogid_list: list[str]) -> pd.DataFrame:
     og_query_results = []
@@ -57,7 +45,7 @@ def ogid_list_2_og_level_info_df(ogid_list: list[str]) -> pd.DataFrame:
     return query_available_OGs_info_df
 
 
-def get_available_ogs(odb_gene_id) -> pd.DataFrame:
+def get_available_ogs(odb_gene_id: str) -> pd.DataFrame:
     """get info about the list of OGs available for an input odb gene id
 
     returns a dataframe with the following columns:
@@ -92,66 +80,77 @@ def select_OG_by_level_name(odb_gene_id: str, level_name: str) -> str:
         raise ValueError(
             f"Multiple OGs found for {odb_gene_id} with level name `{level_name}`. duplicate OGs: {selected_OG_info_df}"
         )
-    return selected_OG_info_df["OG id"].values[0]
-
+    return selected_OG_info_df["OG id"].values[0], selected_OG_info_df["level name"].values[0]
 
 
 # ==============================================================================
 # //
-# ==============================================================================         
-
-    
+# ==============================================================================
 
 
 
-        
-    
-
-class orthoDB_query:
-    """
-    This object's role should be to store the information about the selected ortholog group and the query protein, and to provide methods to query the orthoDB database for information about the ortholog group.
-    """
-
-    odb_database = env.odb_database
-
-    def __init__(self):
-        self.ogid = None
-
-    @staticmethod
-    def _search_df(df, column, query):
-        matches = df[df[column] == query].copy()
-        if len(matches) == 0:
-            print(f"`{query}` not found in {column} column")
-            return None
-        return matches
-
-    @staticmethod
-    def _convert_sequence_dict_to_list(seq_dict):
-        return [seq for seq in seq_dict.values()]
-
-    @staticmethod
-    def _write_sequence_list_2_fasta(seqrecord_list, filename):
-        with open(filename, "w") as f:
-            SeqIO.write(seqrecord_list, f, "fasta")
+# def select_OG_by_level_with_most_species(odbquery: database.orthoDB_query):
+#     temp = odbquery.query_available_OGs_info_df.sort_values(
+#         by="total non-redundant count of species underneath", ascending=False
+#     ).reset_index(drop=True)
+#     odbquery.selected_query_ogid = temp.loc[0, "OG id"]
+#     wrap_up_OG_selection(odbquery)
 
 
 
-    
-        
+# def select_OG_by_target_number_of_species(odbquery: database.orthoDB_query, target_number_of_species):
+#     temp = odbquery.query_available_OGs_info_df.copy()
+#     temp["diff"] = abs(
+#         target_number_of_species
+#         - temp["total non-redundant count of species underneath"]
+#     )
+#     odbquery.selected_query_ogid = temp.loc[temp["diff"].idxmin(), "OG id"]
+#     wrap_up_OG_selection(odbquery)
 
-class odb_orthogroup:
 
 
-    def __init__(self, ogid):
-        self.ogid = ogid
-        _, self.ncbi_tax_id, self.og_name = sql_queries.get_ogid_info(ogid)
-        self.level = env.odb_database.data_levels_taxid_name_dict[int(self.ncbi_tax_id)]
 
-    def __repr__(self):
-        return f"odb_orthogroup - ({self.ogid})"
+# class orthoDB_query:
+#     """
+#     This object's role should be to store the information about the selected ortholog group and the query protein, and to provide methods to query the orthoDB database for information about the ortholog group.
+#     """
 
-    def __str__(self):
-        return f"odb_orthogroup - ({self.ogid})"
+#     odb_database = env.odb_database
 
-    def get_og_sequence_ids(self):
-        return sql_queries.ogid_2_odb_gene_id_list(self.ogid)
+#     def __init__(self):
+#         self.ogid = None
+
+#     @staticmethod
+#     def _search_df(df, column, query):
+#         matches = df[df[column] == query].copy()
+#         if len(matches) == 0:
+#             print(f"`{query}` not found in {column} column")
+#             return None
+#         return matches
+
+#     @staticmethod
+#     def _convert_sequence_dict_to_list(seq_dict):
+#         return [seq for seq in seq_dict.values()]
+
+#     @staticmethod
+#     def _write_sequence_list_2_fasta(seqrecord_list, filename):
+#         with open(filename, "w") as f:
+#             SeqIO.write(seqrecord_list, f, "fasta")
+
+
+# class odb_orthogroup:
+
+
+#     def __init__(self, ogid):
+#         self.ogid = ogid
+#         _, self.ncbi_tax_id, self.og_name = sql_queries.get_ogid_info(ogid)
+#         self.level = env.odb_database.data_levels_taxid_name_dict[int(self.ncbi_tax_id)]
+
+#     def __repr__(self):
+#         return f"odb_orthogroup - ({self.ogid})"
+
+#     def __str__(self):
+#         return f"odb_orthogroup - ({self.ogid})"
+
+#     def get_og_sequence_ids(self):
+#         return sql_queries.ogid_2_odb_gene_id_list(self.ogid)

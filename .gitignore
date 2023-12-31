@@ -9,7 +9,8 @@ workspace.code-workspace
 .vscode/
 plan.md
 *.sqlite
-
+temp.py
+src/archive/
 
 *.pyc
 
