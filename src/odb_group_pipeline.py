@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 from attrs import asdict
-from Bio import AlignIO, SeqIO
+from Bio import SeqIO
 
 import local_env_variables.env_variables as env
 import local_seqtools.cli_wrappers as cli_wrappers
@@ -127,9 +127,9 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id = str | None, odb_gene
     if write_files is True, save the output dict to a separate folder
     '''
     if odb_gene_id is not None:
-        output_dict = pipeline_from_odb_gene_id(config, odb_gene_id)
+        output_dict = pipeline_from_odb_gene_id(config, odb_gene_id) # type: ignore
     elif uniprot_id is not None:
-        output_dict = pipeline_from_uniprot_id(config, uniprot_id)
+        output_dict = pipeline_from_uniprot_id(config, uniprot_id) # type: ignore
     else:
         raise ValueError('either uniprot_id or odb_gene_id must be provided')
     
@@ -148,7 +148,6 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id = str | None, odb_gene
     if config.align_params.align:
         mafft_command, aln = cli_wrappers.mafft_align_wrapper(
             list(output_dict['sequences_clustered_ldos'].values()),
-            output_type='alignment',
             n_align_threads=config.align_params.n_align_threads,
             mafft_executable=config.align_params.mafft_exe,
             extra_args=config.align_params.mafft_additional_args,
@@ -158,7 +157,7 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id = str | None, odb_gene
             alignment_folder.mkdir(parents=True, exist_ok=True)
             alignment_output_file = alignment_folder / f'{output_file_prefix}_clustered_ldos_aln.fasta'
             with open(alignment_output_file, 'w') as f:
-                AlignIO.write(aln, f, 'fasta')
+                SeqIO.write(list(aln.values()), f, 'fasta')
             output_dict['alignment_clustered_ldos_file'] = str(alignment_output_file.resolve())
             output_dict['alignment_clustered_ldos_file_relative'] = str(alignment_output_file.resolve().relative_to(Path.cwd()))
         output_dict['alignment_clustered_ldos_command'] = mafft_command
@@ -167,80 +166,6 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id = str | None, odb_gene
     og_info_json_file = og_info_json_folder / f'{output_file_prefix}_info.json'
     if config.write_files:
         save_info_json(output_dict, og_info_json_file)
-
-
-# def run_pipeline(config: conf.PipelineParams, odb_gene_id: str):
-#     '''
-#     return filename and dict
-#     '''
-#     og_info_json_folder = Path(config.main_output_folder) / 'info_jsons'
-#     output_dict = {}
-#     output_dict['processing params'] = asdict(config)
-
-#     try:
-#         ogid, oglevel = og_selection.select_OG_by_level_name(
-#             odb_gene_id=odb_gene_id,
-#             level_name=config.og_select_params.OG_level_name
-#         )
-#     except ValueError as e:
-#         output_dict['critical error'] = str(e)
-#         return output_dict, f'{odb_gene_id}_info.json'
-    
-#     group_members = sql_queries.ogid_2_odb_gene_id_list(ogid)
-#     sequence_dict = env.odb_database.get_sequences_from_list_of_seq_ids(group_members)
-#     query_seqrecord = sequence_dict[odb_gene_id]
-
-#     filtered_sequence_dict = filter_sequences(
-#         config.filter_params.min_fraction_short_than_query,
-#         query_seqrecord,
-#         sequence_dict,
-#     )
-
-#     pid_df, ldos = find_LDOs.find_LDOs_main(
-#         seqrecord_dict = filtered_sequence_dict,
-#         query_seqrecord = query_seqrecord,
-#         pid_method = config.ldo_select_params.LDO_selection_method,
-#     )
-#     ldo_seqrecord_dict = env.odb_database.get_sequences_from_list_of_seq_ids(ldos)
-
-#     cdhit_command, clustered_ldo_seqrec_dict = cluster.cdhit_main(ldo_seqrecord_dict, odb_gene_id)
-
-#     output_file_prefix = f'{odb_gene_id.replace(":", "_")}_{oglevel}_{ogid}'
-#     output_dict['query_odb_gene_id'] = odb_gene_id
-#     output_dict['query_sequence_str'] = str(query_seqrecord.seq)
-#     output_dict['ogid'] = ogid
-#     output_dict['oglevel'] = oglevel
-#     output_dict['sequences'] = list(sequence_dict.keys())
-#     output_dict['sequences_filtered'] = list(filtered_sequence_dict.keys())
-#     output_dict['sequences_ldos'] = list(ldo_seqrecord_dict.keys())
-#     output_dict['sequences_clustered_ldos'] = list(clustered_ldo_seqrec_dict.keys())
-#     output_dict['cdhit_command'] = cdhit_command
-#     og_info_json_file = og_info_json_folder / f'{output_file_prefix}_info.json'
-
-#     if config.align_params.align:
-#         mafft_command, aln = cli_wrappers.mafft_align_wrapper(
-#             list(clustered_ldo_seqrec_dict.values()),
-#             output_type='alignment',
-#             n_align_threads=config.align_params.n_align_threads,
-#         )
-#         alignment_folder = Path(config.main_output_folder) / 'alignments'
-#         alignment_folder.mkdir(parents=True, exist_ok=True)
-#         alignment_output_file = alignment_folder / f'{output_file_prefix}_clustered_ldos_aln.fasta'
-#         with open(alignment_output_file, 'w') as f:
-#             AlignIO.write(aln, f, 'fasta')
-#         output_dict['alignment_clustered_ldos_file'] = str(alignment_output_file.resolve())
-#         output_dict['alignment_clustered_ldos_file_relative'] = str(alignment_output_file.resolve().relative_to(Path.cwd()))
-#         output_dict['alignment_clustered_ldos_command'] = mafft_command
-
-#     if config.write_files:
-#         save_info_json(output_dict, og_info_json_file)
-
-#     return output_dict, og_info_json_file
-    
-
-
-        
-
 
 
 if __name__ == "__main__":

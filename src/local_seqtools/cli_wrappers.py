@@ -16,15 +16,9 @@ def mafft_align_wrapper(
     input_seqrecord_list: list[SeqIO.SeqRecord],
     mafft_executable: str = env.MAFFT_EXECUTABLE,
     extra_args: str = env.MAFFT_ADDITIONAL_ARGUMENTS,
-    output_type: str = "list",
     fast: bool = False,
     n_align_threads: int = 8,
-) -> tuple[str, list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord] | AlignIO.MultipleSeqAlignment]:
-    assert output_type in [
-        "list",
-        "dict",
-        "alignment",
-    ], f'`output_type` must be one of ["list", "alignment"]'
+) -> tuple[str, dict[str, SeqIO.SeqRecord]]:
     # create temporary file
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
     # write seqrecords to temporary file
@@ -42,28 +36,25 @@ def mafft_align_wrapper(
     # print(mafft_command)
     subprocess.run(mafft_command, shell=True, check=True)
     # read in mafft output
-    if output_type == "list":
-        mafft_output = tools.import_fasta(alignment_filename, output_format="list")
-    elif output_type == "dict":
-        mafft_output = tools.import_fasta(alignment_filename, output_format="dict")
-    elif output_type == "alignment":
-        mafft_output = AlignIO.read(alignment_filename, "fasta")
+    # if output_type == "list":
+    #     mafft_output = tools.import_fasta(alignment_filename, output_format="list")
+    # elif output_type == "dict":
+    #     mafft_output = tools.import_fasta(alignment_filename, output_format="dict")
+    # # elif output_type == "alignment":
+    # else:
+    #     mafft_output = AlignIO.read(alignment_filename, "fasta")
+    mafft_output = tools.import_fasta(alignment_filename, output_format="dict")
     # delete temporary file
     os.remove(alignment_filename)
     os.remove(temp_file.name)
-    return mafft_command, mafft_output
+    return mafft_command, mafft_output # type: ignore
 
 
 def cd_hit_wrapper(
     input_seqrecord_list: list[SeqIO.SeqRecord],
     cd_hit_executable: str = env.CD_HIT_EXECUTABLE,
     extra_args: str = env.CD_HIT_ADDITIONAL_ARGUMENTS,
-    output_type="list",
-) -> tuple[str, list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord], dict[str, dict[str, str]]]:
-    assert output_type in [
-        "list",
-        "dict",
-    ], f'`output_type` must be one of ["list", "dict"]'
+) -> tuple[str, dict[str, SeqIO.SeqRecord], dict[str, dict[str, list[str]]]]:
 
     # create temporary file
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
@@ -83,16 +74,12 @@ def cd_hit_wrapper(
         clustered_seqs_clusters_filename
     )
 
-    # read in clustal output
-    if output_type == "list":
-        output = tools.import_fasta(clustered_seqs_filename, output_format="list")
-    elif output_type == "dict":
-        output = tools.import_fasta(clustered_seqs_filename, output_format="dict")
+    output = tools.import_fasta(clustered_seqs_filename, output_format="dict")
     # delete temporary file
     os.remove(clustered_seqs_filename)
     os.remove(clustered_seqs_clusters_filename)
     os.remove(temp_file.name)
-    return command, output, output_clstrs_dict
+    return command, output, output_clstrs_dict # type: ignore
 
 
 
@@ -120,7 +107,8 @@ def clustal_align_wrapper(
 
     if alignment_type == "basic":
         clustal_command = f'clustalo -i "{temp_file.name}" -o "{alignment_filename}" -v --outfmt=fa --threads=6'
-    elif alignment_type == "full":
+    # elif alignment_type == "full":
+    else:
         clustal_command = f'clustalo -i "{temp_file.name}" -o "{alignment_filename}" -v --outfmt=fa --full --threads=6'
     subprocess.run(clustal_command, shell=True, check=True)
 
@@ -129,7 +117,8 @@ def clustal_align_wrapper(
         clustal_output = tools.import_fasta(alignment_filename, output_format="list")
     elif output_type == "dict":
         clustal_output = tools.import_fasta(alignment_filename, output_format="dict")
-    elif output_type == "alignment":
+    # elif output_type == "alignment":
+    else:
         clustal_output = AlignIO.read(alignment_filename, "fasta")
     # delete temporary file
     os.remove(alignment_filename)
@@ -165,7 +154,8 @@ def muscle_align_wrapper(
         muscle_output = tools.import_fasta(alignment_filename, output_format="list")
     elif output_type == "dict":
         muscle_output = tools.import_fasta(alignment_filename, output_format="dict")
-    elif output_type == "alignment":
+    # elif output_type == "alignment":
+    else:
         muscle_output = AlignIO.read(alignment_filename, "fasta")
 
     # delete temporary file

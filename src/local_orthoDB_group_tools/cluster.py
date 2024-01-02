@@ -1,4 +1,5 @@
 import copy
+from typing import Union
 
 import pandas as pd
 from Bio import SeqIO
@@ -8,7 +9,7 @@ import local_seqtools.cli_wrappers as cli
 
 
 def cdhit_clstr_retrieve_representative_sequences(
-    clstr_dict: dict[str, dict[str, str]], seqrecord_dict: dict[str, SeqIO.SeqRecord]
+    clstr_dict: dict, seqrecord_dict: dict[str, SeqIO.SeqRecord]
 ) -> dict[str, SeqIO.SeqRecord]:
     """
     pull out representative seqs defined in cdhit clstr_dict from full seqrecord_dict
@@ -34,7 +35,7 @@ def cdhit_main(
         repr_id_keywords.append(query_odb_gene_id)
 
     cdhit_command, _, cdhit_clstr_dict = cli.cd_hit_wrapper(
-        list(seqrecord_dict.values()), output_type="dict", **kwargs
+        list(seqrecord_dict.values()), **kwargs
     )
     cdhit_clstr_dict = (
         cdhit_tools.cd_hit_clstr_redefine_cluster_representative_by_keywords(

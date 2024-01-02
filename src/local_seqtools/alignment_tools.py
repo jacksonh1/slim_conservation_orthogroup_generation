@@ -3,10 +3,9 @@ from alfpy import word_distance, word_pattern, word_vector
 from alfpy.utils import distmatrix
 from alfpy.utils import seqrecords as alf_seqrecords
 from Bio import Align, AlignIO, Seq, SeqIO
-import local_seqtools.general_utils as tools
 
 
-def score_alignment(seq1: str, seq2: str, subs_mat_df: pd.DataFrame, gap_open=10, gap_extend=0.5):
+def score_alignment(seq1: str, seq2: str, subs_mat_df: pd.DataFrame, gap_open=-10, gap_extend=-0.5) -> float:
     """returns the score of an alignment between two sequences
 
     treats the following situation as opening 2 gaps:
@@ -30,9 +29,9 @@ def score_alignment(seq1: str, seq2: str, subs_mat_df: pd.DataFrame, gap_open=10
     subs_mat_df : pd.DataFrame
         the scoring matrix as a pandas dataframe
     gap_open : int, optional
-        penalty for opening a gap (will be subtracted from score), by default 10
+        penalty for opening a gap (should be negative), by default -10
     gap_extend : int, optional
-        penalty for extending a gap (will be subtracted from score), by default 0.5
+        penalty for extending a gap (should be negative), by default -0.5
 
     Returns
     -------
@@ -57,7 +56,7 @@ def score_alignment(seq1: str, seq2: str, subs_mat_df: pd.DataFrame, gap_open=10
                 score += gap_open
                 gap2_open_flag = True
         else:
-            score += subs_mat_df.loc[s1, s2]
+            score += float(subs_mat_df.loc[s1, s2]) # type: ignore
             gap1_open_flag = False
             gap2_open_flag = False
     return score
@@ -67,30 +66,6 @@ def score_alignment_from_alignment_obj(alignment_obj, subs_mat_df, gap_open, gap
     seq1 = alignment_obj[0]
     seq2 = alignment_obj[1]
     return score_alignment(seq1, seq2, subs_mat_df, gap_open, gap_extend)
-
-
-def slice_alignment_by_subseq(alignment, hit_subseq):
-    '''
-    ex:
-    alignment:
-        target          560 LPGPQITFPPPPPPPVDD-----SPPDFLPPPPPAANFGSHPPPP 600
-                          0 ||------|||||||.||-----.||||..|||---.|...|||.  45
-        query             0 LP------PPPPPPPLDDPELPPPPPDFMEPPP---DFVPPPPPS  36
-    hit_subseq:
-        LDDPELPPPPPDFMEPPP
-    
-    returns:
-        LDDPELPPPPPDFMEPPP
-        .||-----.||||..|||
-        VDD-----SPPDFLPPPP
-    '''
-    _, index = tools.reindex_alignment_str(alignment[1])
-    unaligned_hit = alignment[1].replace("-", "")
-    st = unaligned_hit.find(hit_subseq)
-    end = st + len(hit_subseq) - 1
-    aln_st = index[st]
-    aln_end = index[end]
-    return alignment[aln_st:aln_end+1]
 
 
 def pairwise_alignment(seq1, seq2, scoring_matrix_name = 'BLOSUM62', gap_opening_penalty = 10, gap_extension_penalty = 0.5):
@@ -103,18 +78,13 @@ def pairwise_alignment(seq1, seq2, scoring_matrix_name = 'BLOSUM62', gap_opening
     return alignment
 
 
-def compute_pairwise_percent_id_from_msa(seqrecord1, seqrecord2):
+def compute_pairwise_percent_id_from_msa(seqrecord1: SeqIO.SeqRecord, seqrecord2: SeqIO.SeqRecord)-> float:
     """compute pairwise percent identity between two sequences
     - The sequences must be pre-aligned (i.e. they have the same length)
     - The returned percent identity is computed as the number of identical 
     residues divided by the LENGTH OF compared alignment sites. Alignment sites 
-    where both sequences are gaps ('-' characters) are not compared.  I am hoping 
-    that this will provide some sort of global measure of similarity between 
-    two sequences as opposed to local similarity
-    - Gaps are not counted as matches
-    TODO: add a parameter to allow for substitution matrix
-    TODO: do a pairwise alignment for each sequence individually and then compute percent identity
-    
+    where both sequences are gaps ('-' characters) are not compared, and thus 
+    do not contribute to the length. 
 
     Parameters
     ----------
@@ -184,7 +154,7 @@ def align_and_get_PID(
     They are passed to the `pairwise_alignment` function
     '''
     aln = pairwise_alignment(seqrecord1.seq, seqrecord2.seq, **kwargs)
-    pid = percent_identity(aln[0], aln[1])
+    pid = percent_identity(aln[0], aln[1]) # type: ignore
     return pid
 
 

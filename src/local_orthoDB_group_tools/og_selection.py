@@ -55,13 +55,15 @@ def get_available_ogs(odb_gene_id: str) -> pd.DataFrame:
     return ogid_list_2_og_level_info_df(ogid_list)
 
 
-def select_OG_by_level_name(odb_gene_id: str, level_name: str) -> str:
+def select_OG_by_level_name(odb_gene_id: str, level_name: str) -> tuple[str, str]:
     """select an OG from the list of available OGs for the selected gene id
 
     Returns
     -------
     str
         the selected OG id
+    str
+        the selected OG level name
 
     Raises
     ------

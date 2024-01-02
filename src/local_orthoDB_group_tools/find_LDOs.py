@@ -2,6 +2,7 @@ import copy
 
 import numpy as np
 import pandas as pd
+from alfpy.utils import distmatrix
 from Bio import SeqIO
 
 import local_orthoDB_group_tools.sql_queries as sql_queries
@@ -20,7 +21,7 @@ def setup_df(seqrecord_dict_in: dict[str, SeqIO.SeqRecord]) -> pd.DataFrame:
 
 
 def _alfpy_query_matrix(
-    query_seqrecord: SeqIO.SeqRecord, matrix: np.ndarray
+    query_seqrecord: SeqIO.SeqRecord, matrix: distmatrix.Matrix
 ) -> tuple[list[str], list[float]]:
     """
     get the row from the alfpy matrix that corresponds to the query gene
@@ -40,16 +41,17 @@ def addpid_by_msa(
 ) -> pd.DataFrame:
     df = df_in.copy()
     seqrecord_list = [seq for seq in seqrecord_dict.values()]
-    _, msa_seqrecord_list = cli.mafft_align_wrapper(
+    _, msa_seqrecord_dict = cli.mafft_align_wrapper(
         seqrecord_list, fast=fast_msa, n_align_threads=n_align_threads
     )
-    query_msa_seqrecord = [i for i in msa_seqrecord_list if i.id == query_seqrecord.id][
-        0
-    ]
+    query_msa_seqrecord = msa_seqrecord_dict[query_seqrecord.id] # type: ignore
+    # query_msa_seqrecord = [i for i in msa_seqrecord_dict if i.id == query_seqrecord.id][ # type: ignore
+        # 0
+    # ]
     # could do this by applying a function to the `id` column but this seems a bit simpler
     pid_map_dict = {
         seq.id: aln_tools.compute_pairwise_percent_id_from_msa(query_msa_seqrecord, seq)
-        for seq in msa_seqrecord_list
+        for seq in msa_seqrecord_dict.values()
     }
     df["PID"] = df["id"].map(pid_map_dict)
     return df
@@ -75,7 +77,7 @@ def addpid_by_msa_by_organism(
             seqs.append(query_seqrecord)
         # align the sequences
         _, msa_i_dict = cli.mafft_align_wrapper(
-            seqs, output_type="dict", fast=fast_msa, n_align_threads=n_align_threads
+            seqs, fast=fast_msa, n_align_threads=n_align_threads
         )
         # compute the pairwise percent identity from the MSA
         for seq_id, seqrecord in msa_i_dict.items():

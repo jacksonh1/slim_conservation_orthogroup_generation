@@ -57,7 +57,7 @@ def cdhit_clstr_retrieve_representative_sequences(clstr_dict, seqrecord_dict):
     return clustered_seq_dict
 
 
-def cdhit_minidriver(seqrecords_2_cluster_list, repr_id_keywords, linux=False):
+def cdhit_minidriver(seqrecords_2_cluster_list, repr_id_keywords):
     """
     in: list of seqrecords
     out: dict of clustered seqrecords
@@ -66,7 +66,7 @@ def cdhit_minidriver(seqrecords_2_cluster_list, repr_id_keywords, linux=False):
     seqrecords_2_cluster_dict = {
         seqrecord.id: seqrecord for seqrecord in seqrecords_2_cluster_list
     }
-    _, cdhit_clstr_dict = cli.cd_hit_wrapper(seqrecords_2_cluster_list, output_type="dict", linux=linux)
+    _, _, cdhit_clstr_dict = cli.cd_hit_wrapper(seqrecords_2_cluster_list)
     cdhit_clstr_dict = cd_hit_clstr_redefine_cluster_representative_by_keywords(cdhit_clstr_dict, keywords=repr_id_keywords)
     sequences_clustered_OG_dict = cdhit_clstr_retrieve_representative_sequences(
         cdhit_clstr_dict, seqrecords_2_cluster_dict

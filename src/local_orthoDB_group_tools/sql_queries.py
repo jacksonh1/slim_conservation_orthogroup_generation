@@ -1,10 +1,6 @@
 import sqlite3
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
-from Bio import Align, AlignIO, Seq, SeqIO
-
 from local_env_variables import env_variables as env
 
 

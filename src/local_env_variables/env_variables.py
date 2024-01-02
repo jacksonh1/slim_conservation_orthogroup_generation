@@ -1,6 +1,5 @@
 import copy
 import os
-from dataclasses import dataclass
 from pathlib import Path
 
 import dotenv

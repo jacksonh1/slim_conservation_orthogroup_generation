@@ -6,7 +6,10 @@ og_select_params:
   OG_level_name: Vertebrata
 
 ldo_select_params:
-  LDO_selection_method: alfpy_google_distance
+  # LDO_selection_method: alfpy_google_distance
+  # LDO_selection_method: msa
+  LDO_selection_method: msa_by_organism
+  # LDO_selection_method: pairwise
 
 align_params:
   align: true
