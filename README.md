@@ -25,6 +25,8 @@ This repository contains tools to retrieve and process ortholog groups from a lo
    - *Note: If it can't find an orthoDB ID for a given UniprotID, it doesn't mean that the protein is absent from the orthoDB. It could still be present but was retrieved from a different database and a uniprot ID was not mapped to it. View OrthoDB documentation for more info on where the sequences come from. I have not solved this problem. In the future, it would be nice to develop a way to search for the actual full length sequence using blast or something, if it fails to find the uniprot ID*
 2. **Retrieve the orthoDB-defined groups of homologous sequences** (orthogroup IDs) containing the query protein
 3. **Select a group based on phylogenetic level**
+    - OrthoDB constructs ortholog groups at different phylogenetic levels (e.g. Eukaryota, Metazoa, Vertebrata, etc.). Thus, a protein will probably be part of multiple groups at different levels. Look at the orthoDB page for pcare as an example (https://www.orthodb.org/?query=pcare)
+    - For short linear motifs, we have found that the Vertebrata level typically works well for conservation analysis
 4. **Filter** out sequences in the group that are too short (relative to the length of the query sequence) or that contain non amino acid characters
 5. **Filter to least divergent orthologs (LDOs)**:
    - For each organism in the group, select the sequence that is most similar to the query sequence such that there is only one sequence per organism
@@ -42,11 +44,11 @@ The main advantages of using these tools:
     - Retrieving ortholog groups from the downloaded files requires cross-referencing multiple large files and linking different tables with ids. 
     - I've basically figured all of that out for you so that it's easy to go from a query protein to a set of orthologs.
 - reducing ortholog groups to least divergent orthologs (LDOs). 
-    - This simplifies a conservation analysis by removing paralogs. It crudely assumes that the most similar sequence to the query sequence is sequence in that organism to compare with.
-    - You arguably lose information doing this, but it greatly simplifies the analysis when you are looking at conservation for a lot of proteins (too many to manually inspect all of the sequences/alignments)
+    - This simplifies a conservation analysis by removing paralogs. It crudely assumes that the most similar sequence to the query sequence is the appropriate sequence in that organism to compare with.
+    - You arguably lose information doing this (paralogs), but it greatly simplifies the analysis when you are looking at conservation for a lot of proteins (too many to manually inspect all of the sequences/alignments)
 - clustering
     - Clustering reduces sequence redundancy and results in a more even distribution of sequence diversity over the group, which is very helpful in a conservation analysis.
-        - Imagine you had a group of 100 homologs: 60 from primates with 99 % identity, 20 from other mammals, and 20 distributed across more distant Eukaryotes. The conservation analysis would be dominated by the primates and would not be very informative. The clustering would collapse the 60 primate sequences into one sequence, which would make the analysis more informative.
+        - Imagine you had a group of 100 homologous sequences: 60 from mammals, all with > 95 % identity and 40 distributed across more distant Vertebrates. The conservation analysis would be dominated by the mammals and would not be very informative. Preclustering would collapse highly similar sequences (>90% identity by default) into one sequence, which would make the analysis more informative.
 
 
 # setup TL;DR:
@@ -85,7 +87,7 @@ git clone https://github.com/jacksonh1/orthogroup_generation.git
   - add a `ORTHODB_DATA_DIR` variable with the absolute path to the directory containing the downloaded files
   - example `.env` file: 
 ```
-ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0aa/
+ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0/
 ```
 - I have included example files in the `./data/orthoDB_sample_data/` directory. These files are from orthoDB version 11.0 and are just subsets of the full files<br>
 - Note: *if you use a different version of orthoDB, you will need to change the file names in `./src/local_env_variables/env_variables.py`. File names are hard coded in the `orthoDB_files_object` class*
@@ -131,15 +133,14 @@ Warning - this will take a while to run and I don't think it can be parallelized
 # Usage
 
 There are two main ways to use this pipeline: <br>
-1. generate ortholog groups for a small number of query proteins from a table
+1. generate ortholog groups for a small number of query proteins
 2. generate ortholog groups for every protein in a organism's proteome
 
-example for choosing levels: https://www.orthodb.org/?query=pcare
 
 # brief explanation of the orthoDB data
 You can view the readme file that comes with the orthoDB download for more information. <br>
 The data is organized using some internal id numbers. <br>
-Here is a brief explanation of the ids and how I've refered to them in the code.
+Here is a brief explanation of the ids and how I've refered to them in the code:
 - **odb_gene_id**: An internal orthoDB id. It defines a specific protein sequence in the database. The sequences in the fasta file have the orthoDB id as the sequence id. It is not consistent across versions of orthoDB.
   - example: `9606_0:001c7b`
   - odb_gene_id's are mapped to a variety of other ids corresponding to outside databases (e.g. uniprot, ensembl, etc.) or they were downloaded from some database and have a corresponding id. This information is stored in the `odb11v0_gene_xrefs.tab`/`odb11v0_genes.tab` files.
@@ -161,6 +162,7 @@ Here is a brief explanation of the ids and how I've refered to them in the code.
       | 5821at314295   | Hominoidea       |                                                 7 |
       | 5821at9604     | Hominidae        |                                                 5 |
       - These correspond with the groups on the website: https://www.orthodb.org/?query=9606_0%3A001c7b
+  
 
 
 # pipeline
