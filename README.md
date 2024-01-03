@@ -18,7 +18,9 @@
   - [generate SQLite databases for orthoDB files](#generate-sqlite-databases-for-orthodb-files)
 
 # orthoDB groups for conservation analysis
-This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database ([link](https://www.orthodb.org/)) in preparation for downstream conservation analysis. <br><br>
+This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream conservation analysis. <br><br>
+- Note: I refer  to these sequences as orthologs at many places throughout this repo but it is probably more accurate to refer to them as homologs. I use the term orthologs because that is what orthoDB calls them. see orthoDB [terminology](https://www.ezlab.org/orthodb_userguide.html#terminology)
+
 
 ## Pipeline overview:
 1. **Find a query protein in the orthoDB database** (retrieve the corresponding orthoDB ID)
@@ -26,7 +28,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
    - *Note: If it can't find an orthoDB ID for a given UniprotID, it doesn't mean that the protein is absent from the orthoDB. It could still be present but was retrieved from a different database and a uniprot ID was not mapped to it. View OrthoDB documentation for more info on where the sequences come from. I have not solved this problem. In the future, it would be nice to develop a way to search for the actual full length sequence using blast or something, if it fails to find the uniprot ID*
 2. **Retrieve the orthoDB-defined groups of homologous sequences** (orthogroup IDs) containing the query protein
 3. **Select a group based on phylogenetic level**
-    - OrthoDB constructs ortholog groups at different phylogenetic levels (e.g. Eukaryota, Metazoa, Vertebrata, etc.). Thus, a protein will probably be part of multiple groups at different levels. Look at the orthoDB page for pcare as an example (https://www.orthodb.org/?query=pcare)
+    - OrthoDB constructs groups of homologs at different phylogenetic levels (e.g. Eukaryota, Metazoa, Vertebrata, etc.). Thus, a protein will probably be part of multiple groups at different levels. Look at the orthoDB page for pcare as an example (https://www.orthodb.org/?query=pcare)
     - For short linear motifs, we have found that the Vertebrata level typically works well for conservation analysis
 4. **Filter** out sequences in the group that are too short (relative to the length of the query sequence) or that contain non amino acid characters
 5. **Filter to least divergent orthologs (LDOs)**:
@@ -37,11 +39,11 @@ This repository contains tools to retrieve and process ortholog groups from a lo
     - the group information is output in the form of a json file that can be imported as a python object (see `./examples/` for examples of how to use the object)
 
 ### outside resources used (and links):
-- orthoDB database
-- MAFFT
-- CD-HIT
-- alfpy
-- BioPython
+- [orthoDB database](https://www.orthodb.org/)
+- [MAFFT](https://mafft.cbrc.jp/alignment/software/)
+- [CD-HIT](https://sites.google.com/view/cd-hit)
+- [alfpy](https://github.com/aziele/alfpy)
+- [BioPython](https://biopython.org/)
 - and other python packages ... see `./environment.yml` for a full list of dependencies
 
 # setup TL;DR:
