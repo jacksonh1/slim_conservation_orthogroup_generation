@@ -165,4 +165,3 @@ dependencies:
   - zlib=1.2.13=h8a1eda9_5
   - pip:
       - alfpy==1.0.6
-prefix: /Users/jackson/mambaforge/envs/odb_groups_x86

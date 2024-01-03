@@ -2,19 +2,20 @@
 - [Table of contents](#table-of-contents)
 - [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
-  - [comments](#comments)
+    - [outside resources used (and links):](#outside-resources-used-and-links)
 - [setup TL;DR:](#setup-tldr)
+- [Usage](#usage)
+- [Advanced stuff](#advanced-stuff)
+  - [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data)
+  - [advanced configuration](#advanced-configuration)
+  - [comments](#comments)
+  - [source code](#source-code)
 - [setup (more detailed):](#setup-more-detailed)
   - [Download this repository](#download-this-repository)
   - [Download orthoDB database files](#download-orthodb-database-files)
   - [conda environment](#conda-environment)
   - [install local tools in environment](#install-local-tools-in-environment)
   - [generate SQLite databases for orthoDB files](#generate-sqlite-databases-for-orthodb-files)
-- [Usage](#usage)
-- [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data)
-- [pipeline](#pipeline)
-- [Parameters](#parameters)
-  - [alignment](#alignment)
 
 # orthoDB groups for conservation analysis
 This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database ([link](https://www.orthodb.org/)) in preparation for downstream conservation analysis. <br><br>
@@ -35,6 +36,70 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 8. **output** the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
     - the group information is output in the form of a json file that can be imported as a python object (see `./examples/` for examples of how to use the object)
 
+### outside resources used (and links):
+- orthoDB database
+- MAFFT
+- CD-HIT
+- alfpy
+- BioPython
+- and other python packages ... see `./environment.yml` for a full list of dependencies
+
+# setup TL;DR:
+1. download this repository
+2. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
+3. navigate to this downloaded repository in terminal (where this README file is located)
+4. edit the `.env` file with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
+5. create a new environment with the dependencies: `conda env create -f environment.yml` <br>
+6. activate the environment: `conda activate odb_groups_x86` <br>
+7. install the local package: `pip install .` <br>
+8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
+
+# Usage
+
+**Look at the `./example/` directory** where there are multiple different applications of the pipeline shown.
+
+There are different ways to use this pipeline depending on your use case:
+- You may want to run the pipeline on a small number of genes from a table
+- Or you may want to run the pipeline on all of the proteins in an organism's proteome at different phylogenetic levels and use the output as a database for downstream conservation analysis. <br>
+- examples of both of these use cases are shown in the `./examples/` directory
+
+The main pipeline is executed via the script: `./src/scripts/odb_group_pipeline.py`
+- This script runs the full pipeline for a single gene (see [pipeline overview](#pipeline-overview)) <br>
+    - The gene can be specified using a uniprot ID or an odb_gene_id (see [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data) for more info on these ids)
+- It can be run as a command line script or imported to be used in another script (like if you are running it on a lot of genes). 
+
+How to use and configure the pipeline is explained in detail in `./examples/readme.md` <br>
+
+# Advanced stuff
+## brief explanation of the orthoDB data
+You can view the readme file that comes with the orthoDB download for more information. <br>
+The data is organized using some internal id numbers. <br>
+Here is a brief explanation of the ids and how I've refered to them in the code:
+- **odb_gene_id**: An internal orthoDB id. It defines a specific protein sequence in the database. The sequences in the fasta file have the orthoDB id as the sequence id. It is not consistent across versions of orthoDB.
+  - example: `9606_0:001c7b`
+  - odb_gene_id's are mapped to a variety of other ids corresponding to outside databases (e.g. uniprot, ensembl, etc.) or they were downloaded from some database and have a corresponding id. This information is stored in the `odb11v0_gene_xrefs.tab`/`odb11v0_genes.tab` files.
+- **og_id**: An internal orthoDB id. It is probably not consistent across versions of orthoDB. It defines a group of homologous sequences. Each phylogenetic level of homologs has a unique og_id. So a single odb_gene_id probably belongs to multiple og_ids.
+  - example og_id: `1567973at7742`
+  - example - all of the og_id's that contain the odb_gene_id `9606_0:001c7b`:
+    - `605262at9347`, `70995at314146`, `5821at9604`, `1742826at33208`, `5821at314295`, `4349at40674`, `1005199at32523`, `1567973at7742`, `5471876at2759`, `70995at9443`
+  - Each of the og_id's is associated with a phylogenetic level at which it was constructed:
+      | OG id          | level name       |   total non-redundant count of species underneath |
+      |:---------------|:-----------------|--------------------------------------------------:|
+      | 5471876at2759  | Eukaryota        |                                              1952 |
+      | 1742826at33208 | Metazoa          |                                               817 |
+      | 1567973at7742  | Vertebrata       |                                               470 |
+      | 1005199at32523 | Tetrapoda        |                                               325 |
+      | 4349at40674    | Mammalia         |                                               191 |
+      | 605262at9347   | Eutheria         |                                               182 |
+      | 70995at314146  | Euarchontoglires |                                                70 |
+      | 70995at9443    | Primates         |                                                30 |
+      | 5821at314295   | Hominoidea       |                                                 7 |
+      | 5821at9604     | Hominidae        |                                                 5 |
+      - These correspond with the groups on the website: https://www.orthodb.org/?query=9606_0%3A001c7b
+
+## advanced configuration
+you can use your own alignment program by changing the `ALIGNER_EXECUTABLE` variable in the `.env` file
+
 ## comments
 The main advantages of using these tools:
 - the ability to query the orthoDB files quickly (using SQLite databases)
@@ -49,17 +114,12 @@ The main advantages of using these tools:
 - clustering
     - Clustering reduces sequence redundancy and results in a more even distribution of sequence diversity over the group, which is very helpful in a conservation analysis.
         - Imagine you had a group of 100 homologous sequences: 60 from mammals, all with > 95 % identity and 40 distributed across more distant Vertebrates. The conservation analysis would be dominated by the mammals and would not be very informative. Preclustering would collapse highly similar sequences (>90% identity by default) into one sequence, which would make the analysis more informative.
+Notes:
+This pipeline could probably benefit from using a workflow manager like snakemake or nextflow. However, I'm not sure if it would be worth the extra effort required for people to understand if they are unfamiliar with those tools. 
+I've considered using a config manager like hydra, but it has the same potential downfall. 
 
-
-# setup TL;DR:
-1. download this repository
-2. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
-3. navigate to this downloaded repository in terminal (where this README file is located)
-4. edit the `.env` file with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
-5. create a new environment with the dependencies: `conda env create -f environment.yml` <br>
-6. activate the environment: `conda activate odb_groups_x86` <br>
-7. install the local package: `pip install .` <br>
-8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
+## source code
+- see `./src/readme.md` for more info on the source code
 
 # setup (more detailed):
 
@@ -129,55 +189,3 @@ bash ./prepare_data.sh
 Warning - this will take a while to run and I don't think it can be parallelized (Let me know if this is possible because I would love to know how if so). <br>
 
 *Note: I am creating a separate database for each file. You could easily make one database with all of the tables. I tried this but it was significantly slower to query and I don't know why.* <br>
-
-# Usage
-
-There are two main ways to use this pipeline: <br>
-1. generate ortholog groups for a small number of query proteins
-2. generate ortholog groups for every protein in a organism's proteome
-
-
-# brief explanation of the orthoDB data
-You can view the readme file that comes with the orthoDB download for more information. <br>
-The data is organized using some internal id numbers. <br>
-Here is a brief explanation of the ids and how I've refered to them in the code:
-- **odb_gene_id**: An internal orthoDB id. It defines a specific protein sequence in the database. The sequences in the fasta file have the orthoDB id as the sequence id. It is not consistent across versions of orthoDB.
-  - example: `9606_0:001c7b`
-  - odb_gene_id's are mapped to a variety of other ids corresponding to outside databases (e.g. uniprot, ensembl, etc.) or they were downloaded from some database and have a corresponding id. This information is stored in the `odb11v0_gene_xrefs.tab`/`odb11v0_genes.tab` files.
-- **og_id**: An internal orthoDB id. It is probably not consistent across versions of orthoDB. It defines a group of homologous sequences. Each phylogenetic level of homologs has a unique og_id. So a single odb_gene_id probably belongs to multiple og_ids.
-  - example og_id: `1567973at7742`
-  - example - all of the og_id's that contain the odb_gene_id `9606_0:001c7b`:
-    - `605262at9347`, `70995at314146`, `5821at9604`, `1742826at33208`, `5821at314295`, `4349at40674`, `1005199at32523`, `1567973at7742`, `5471876at2759`, `70995at9443`
-  - Each of the og_id's is associated with a phylogenetic level at which it was constructed:
-      | OG id          | level name       |   total non-redundant count of species underneath |
-      |:---------------|:-----------------|--------------------------------------------------:|
-      | 5471876at2759  | Eukaryota        |                                              1952 |
-      | 1742826at33208 | Metazoa          |                                               817 |
-      | 1567973at7742  | Vertebrata       |                                               470 |
-      | 1005199at32523 | Tetrapoda        |                                               325 |
-      | 4349at40674    | Mammalia         |                                               191 |
-      | 605262at9347   | Eutheria         |                                               182 |
-      | 70995at314146  | Euarchontoglires |                                                70 |
-      | 70995at9443    | Primates         |                                                30 |
-      | 5821at314295   | Hominoidea       |                                                 7 |
-      | 5821at9604     | Hominidae        |                                                 5 |
-      - These correspond with the groups on the website: https://www.orthodb.org/?query=9606_0%3A001c7b
-  
-
-
-# pipeline
-- To see the pipeline for a single query protein, see`./examples/orthogroup_generation_for_single_protein.ipynb`
-
-
-# Parameters
-
-## alignment
-you can use your own alignment program by changing the `ALIGNER_EXECUTABLE` variable in the `.env` file
-
-
-
-Notes:
-This pipeline could probably benefit from using a workflow manager like snakemake or nextflow. However, I'm not sure if it would be worth the extra effort required for people to understand if they are unfamiliar with those tools. 
-I've considered using a config manager like hydra, but it has the same potential downfall. 
-
-

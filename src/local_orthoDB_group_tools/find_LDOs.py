@@ -60,8 +60,8 @@ def addpid_by_msa(
 def addpid_by_msa_by_organism(
     df_in: pd.DataFrame,
     query_seqrecord: SeqIO.SeqRecord,
-    fast_msa: bool = False,
     n_align_threads: int = 8,
+    **mafft_kwargs,
 ) -> pd.DataFrame:
     df = df_in.copy()
     print("aligning sequences using mafft, one organism at a time")
@@ -77,7 +77,7 @@ def addpid_by_msa_by_organism(
             seqs.append(query_seqrecord)
         # align the sequences
         _, msa_i_dict = cli.mafft_align_wrapper(
-            seqs, fast=fast_msa, n_align_threads=n_align_threads
+            seqs, n_align_threads=n_align_threads, **mafft_kwargs
         )
         # compute the pairwise percent identity from the MSA
         for seq_id, seqrecord in msa_i_dict.items():
@@ -146,8 +146,8 @@ def find_LDOs_main(
     seqrecord_dict: dict[str, SeqIO.SeqRecord],
     query_seqrecord: SeqIO.SeqRecord,
     pid_method: str = "alfpy_google_distance",
-    fast_msa: bool = False,
     n_align_threads: int = 8,
+    **mafft_kwargs,
 ) -> tuple[pd.DataFrame, list[str]]:
     assert pid_method in [
         "msa_by_organism",
@@ -158,7 +158,7 @@ def find_LDOs_main(
     df = setup_df(seqrecord_dict)
     if pid_method == "msa_by_organism":
         df = addpid_by_msa_by_organism(
-            df, query_seqrecord, n_align_threads=n_align_threads
+            df, query_seqrecord, n_align_threads=n_align_threads, **mafft_kwargs
         )
     elif pid_method == "alfpy_google_distance":
         df = addpid_by_alfpy_google_distance(df, query_seqrecord)
@@ -169,7 +169,7 @@ def find_LDOs_main(
             df,
             query_seqrecord,
             seqrecord_dict,
-            fast_msa=fast_msa,
             n_align_threads=n_align_threads,
+            **mafft_kwargs,
         )
     return df, get_LDOs_from_pids(df, query_seqrecord)

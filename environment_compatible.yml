@@ -1,0 +1,19 @@
+name: odb_groups_x86
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - pandas
+  - numpy
+  - jupyter
+  - biopython
+  - cd-hit
+  - ca-certificates
+  - certifi
+  - openssl
+  - mafft
+  - python-dotenv
+  - pyprojroot
+  - tabulate
+  - pip:
+    - alfpy
