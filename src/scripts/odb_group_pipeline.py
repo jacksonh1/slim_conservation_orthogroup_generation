@@ -174,8 +174,11 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id: str | None = None, od
 
 
 if __name__ == "__main__":
+    # get the default parameters just to print them in the help message
+    # this is a bit hacky but it works
+    # filter out the private attributes (those that start with '_') because they cannot be modified in the config file
     d_params = ''
-    for k,v in asdict(conf.PipelineParams()).items():
+    for k,v in asdict(conf.PipelineParams(), filter=lambda attr, value: not str(attr.name).startswith('_')).items():
         d_params += f'- {k}: {v}\n'
 
     parser = argparse.ArgumentParser(

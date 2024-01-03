@@ -1,6 +1,6 @@
 # examples of how to use the pipeline
 
-The main pipeline (`../src/scripts/odb_group_pipeline.py`), runs the pipeline for a single gene id. <br>
+The file `../src/scripts/odb_group_pipeline.py`, runs the pipeline for a single gene id. This should be the only file that you need to access run the pipeline<br>
 it outputs files with the results in json format and alignments in fasta format (if alignment is specified in the parameters). <br>
 The output will look like:
 ```bash
@@ -29,10 +29,8 @@ run main orthoDB group generation pipeline for a single gene
     The default parameters are:
 - filter_params: {'min_fraction_short_than_query': 0.5}
 - og_select_params: {'OG_selection_method': 'level_name', 'OG_level_name': 'Vertebrata'}
-- ldo_select_params: {'LDO_selection_method': 'alfpy_google_distance', 'LDO_msa_exe': 'mafft', 'LDO_msa_threads': 8}
-- align_params: {'align': False, 'n_align_threads': 8, 'mafft_exe': 'mafft', 'mafft_additional_args': ''}
-- cd_hit_exe: cd-hit
-- cd_hit_additional_args: 
+- ldo_select_params: {'LDO_selection_method': 'alfpy_google_distance', 'LDO_mafft_threads': 8}
+- align_params: {'align': False, 'n_align_threads': 8}
 - main_output_folder: ./odb_group_construction_output
 - write_files: True
 
@@ -46,8 +44,8 @@ options:
                         path to config file, default=None
 ```
 Either `-odbid` or `-unid` must be specified. <br>
-This is the "query" sequence that the analysis is centered on (provided by either uniprot id or odb gene id). <br>
-The `-c` argument is optional. If it is not specified, the default parameters will be used. <br>
+This is the "query" sequence that the analysis is centered on (provided by either uniprot id or odb gene id). It is the sequence that you are retrieving orthologs for.<br>
+The `-c` argument is optional and specifies the location of a configuration file which can be used to specify the pipeline parameters. If it is not specified, the default parameters will be used. <br>
 Any of the parameters can be specified in the config file and they will overwrite the defaults. Any parameters absent from the config file will take on the default value. More on the parameters below: <br>
 
 
@@ -73,19 +71,23 @@ The parameters are:
     - `True`: (Default) align the LDOs
     - `False`: do not align the LDOs
   - `n_align_threads`: the number of threads to use for alignment. Default=8
+- main_output_folder: the folder to write the output files to. Default=`./odb_group_construction_output`
+- write_files: whether or not to write the output files. Can be one of:
+  - `True`: (Default) write the output files
+  - `False`: do not write the output files
+
+The parameters need to be provided in a yaml file. <br>
+If you are not familiar with yaml, it is fairly easy to understand by just looking at an example:<br>
 ```yaml 
 filter_params:
   min_fraction_short_than_query: 0.5
 
 og_select_params:
   OG_selection_method: level_name
-  # OG_level_name: Vertebrata
+  OG_level_name: Vertebrata
 
 ldo_select_params:
   LDO_selection_method: alfpy_google_distance
-  # LDO_selection_method: msa
-  # LDO_selection_method: msa_by_organism
-  # LDO_selection_method: pairwise
 
 align_params:
   align: false
@@ -94,27 +96,26 @@ align_params:
 main_output_folder: odb_group_construction_output
 write_files: true
 ```
-```
+More configuration files are used in the examples here and you can just copy and edit those for your own use (*e.g.* `./ex1_single_gene/params.yml`).
 
 
 ## examples shown here:
 
 ### `./ex1_single_gene/`:
 
+In this example, the pipeline is run for a single gene using the script as a command line script (via a one-line bash script `./ex1_single_gene/run.sh`).
+
 ### `./ex2_table_with_uniprot_ids/`:
 
-In this example a table with a column of uniprot ids is imported and ortholog groups are constructed for each uniprot id
+In this example a table with a column of uniprot ids is imported and ortholog groups are constructed for each uniprot id. The resulting file paths are mapped back to the original table and the table is written to a new file. <br>
 
 ### `./ex3_all_human_genes/`:
-
 In this example, there is a script that runs the pipeline for all of the human genes in the database.
 The script is imported instead of run as a command line script. I've also written the script to run the pipeline using multiprocessing
 
 ### `./pipeline_walkthrough_for_single_gene/`:
 
 This folder contains a notebook that walks through the pipeline step by step to show how the source code works.
-
-
 
 ###  snakemake alignment? `./`
 

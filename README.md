@@ -54,9 +54,11 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 7. install the local package: `pip install .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
 
+Check out the longer [setup](#setup-more-detailed) instructions below for more details.
+
 # Usage
 
-**Look at the `./example/` directory** where there are multiple different applications of the pipeline shown.
+**Look at the `./examples/` directory** where there are multiple different applications of the pipeline shown.
 
 There are different ways to use this pipeline depending on your use case:
 - You may want to run the pipeline on a small number of genes from a table
