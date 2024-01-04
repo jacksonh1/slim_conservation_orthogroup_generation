@@ -2,7 +2,7 @@ import multiprocessing
 
 import local_config.conf as conf
 import local_orthoDB_group_tools.sql_queries as sql_queries
-import scripts.odb_group_pipeline as pipeline
+import local_scripts.odb_group_pipeline as pipeline
 
 SPECIES_ID = "9606_0"
 
@@ -22,7 +22,7 @@ def main(config: conf.PipelineParams, og_levels: list, multiprocess=True):
     odbgeneid_list = sql_queries.get_all_odb_gene_ids_from_species_id("9606_0")
     # odbgeneid_list = ["9606_0:00194d", "9606_0:002f40"]
     if multiprocess:
-        p = multiprocessing.Pool(32)
+        p = multiprocessing.Pool(multiprocessing.cpu_count()-2)
         f_args = [(config, i, og_levels) for i in odbgeneid_list]
         p.starmap(multiple_levels, f_args)
         p.close()

@@ -16,9 +16,9 @@ def mafft_align_wrapper(
     input_seqrecord_list: list[SeqIO.SeqRecord],
     mafft_executable: str = env.MAFFT_EXECUTABLE,
     extra_args: str = env.MAFFT_ADDITIONAL_ARGUMENTS,
-    fast: bool = False,
     n_align_threads: int = 8,
 ) -> tuple[str, dict[str, SeqIO.SeqRecord]]:
+    # example extra_args: "--retree 1"
     # create temporary file
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
     # write seqrecords to temporary file
@@ -29,20 +29,10 @@ def mafft_align_wrapper(
     # raise an error if the alignment file already exists. (it won't but just in case)
     if os.path.exists(alignment_filename):
         raise FileExistsError(f"{alignment_filename} already exists")
-    if fast:
-        mafft_command = f'{mafft_executable} --thread {n_align_threads} --quiet --retree 1 {extra_args} "{temp_file.name}" > "{alignment_filename}"'
     else:
         mafft_command = f'{mafft_executable} --thread {n_align_threads} --quiet --anysymbol {extra_args} "{temp_file.name}" > "{alignment_filename}"'
     # print(mafft_command)
     subprocess.run(mafft_command, shell=True, check=True)
-    # read in mafft output
-    # if output_type == "list":
-    #     mafft_output = tools.import_fasta(alignment_filename, output_format="list")
-    # elif output_type == "dict":
-    #     mafft_output = tools.import_fasta(alignment_filename, output_format="dict")
-    # # elif output_type == "alignment":
-    # else:
-    #     mafft_output = AlignIO.read(alignment_filename, "fasta")
     mafft_output = tools.import_fasta(alignment_filename, output_format="dict")
     # delete temporary file
     os.remove(alignment_filename)

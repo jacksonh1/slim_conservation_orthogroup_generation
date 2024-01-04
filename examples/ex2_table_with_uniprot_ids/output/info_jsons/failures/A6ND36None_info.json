@@ -1,0 +1,29 @@
+{
+    "query_uniprot_id": "A6ND36",
+    "critical error": "Uniprot id `A6ND36` not found in human gene key or xref tables",
+    "processing params": {
+        "filter_params": {
+            "min_fraction_shorter_than_query": 0.5
+        },
+        "og_select_params": {
+            "OG_selection_method": "level_name",
+            "OG_level_name": "Vertebrata"
+        },
+        "ldo_select_params": {
+            "LDO_selection_method": "alfpy_google_distance",
+            "_LDO_mafft_exe": "mafft",
+            "_LDO_mafft_additional_args": "",
+            "LDO_mafft_threads": 8
+        },
+        "align_params": {
+            "align": false,
+            "n_align_threads": 8,
+            "_mafft_exe": "mafft",
+            "_mafft_additional_args": ""
+        },
+        "_cd_hit_exe": "cd-hit",
+        "_cd_hit_additional_args": "",
+        "main_output_folder": "output",
+        "write_files": true
+    }
+}

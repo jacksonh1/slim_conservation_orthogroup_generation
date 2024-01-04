@@ -17,11 +17,11 @@ class FilterConf:
     """sequence filtering parameters
     
     Attributes:
-    `min_fraction_short_than_query`: float,
+    `min_fraction_shorter_than_query`: float,
         the minimum fraction of the query sequence length that each orthogroup sequence must be.
         Default: 0.5
     """
-    min_fraction_short_than_query: float = field(
+    min_fraction_shorter_than_query: float = field(
         default=0.5, validator=validators.and_(validators.le(1), validators.ge(0))
     )
 
@@ -107,7 +107,7 @@ class PipelineParams:
     align_params: AlignConf = field(default=AlignConf())
     _cd_hit_exe: str = field(default=env.CD_HIT_EXECUTABLE)
     _cd_hit_additional_args: str = field(default=env.CD_HIT_ADDITIONAL_ARGUMENTS)
-    main_output_folder: str = field(default="./odb_group_construction_output")
+    main_output_folder: str = field(default="./processed_odb_groups_output")
     write_files: bool = field(default=True)
 
     @classmethod
@@ -128,7 +128,7 @@ class PipelineParams:
 
 # DEFAULT_PARAM_DICT = {
 #     "filter_params": {
-#         "min_fraction_short_than_query": 0.5,
+#         "min_fraction_shorter_than_query": 0.5,
 #     },
 #     "og_select_params": {
 #         "OG_selection_method": "level_name",
@@ -148,5 +148,5 @@ class PipelineParams:
 
 # config = PipelineParams.from_dict(DEFAULT_PARAM_DICT)
 # print(config)
-# print(config.filter_params.min_fraction_short_than_query)
+# print(config.filter_params.min_fraction_shorter_than_query)
 # print(DEFAULT_PARAM_DICT) 

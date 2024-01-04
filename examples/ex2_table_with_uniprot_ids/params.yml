@@ -3,7 +3,7 @@ filter_params:
 
 og_select_params:
   OG_selection_method: level_name
-  # OG_level_name: Vertebrata
+  OG_level_name: Vertebrata
 
 ldo_select_params:
   LDO_selection_method: alfpy_google_distance

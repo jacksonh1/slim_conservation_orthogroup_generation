@@ -1,27 +1,8 @@
 {
-    "query_uniprot_id": "Q8TC90",
     "query_odb_gene_id": "9606_0:002f40",
     "query_sequence_str": "MTQTLDTREDPLNLGGGGGGGCGCGWAHSASLSSWSSCHRRRPGAPAYNRPHRYSPKTEYGPPRKQPKQQHGPGFWFQPPVCSNWGCWGGPWRPPPPGFWKFPCPVQVFRVYGLHPLCFCCCSCWSGSWNPGWVKPPGRKKRWGRRGRGLRHHPRHSYPRSPPADVSTLPRPVKLYEWREPGMRAPPNTTQFIMNQIYEDMRQQEKVERQQEALRAQKATVSGEASPARSSGNDAPPGGSKETWGLQETLYGFVQNPSLAFSPNPEENQSLAPLLVEEEEEKKNDDEEEYDQEVCDAKEASEEEEEVEDEEEEVEDEEEEEVEEAEYVEEGEEELEEEELEEEEEVLEENEQRGEEFHLPLEMPLSIFVEAEEKRENFISCTFLNPEQIIPKVPQESLFMAQDFNC",
     "ogid": "869863at7742",
     "oglevel": "Vertebrata",
-    "processing params": {
-        "filter_params": {
-            "min_fraction_short_than_query": 0.5
-        },
-        "og_select_params": {
-            "OG_selection_method": "level_name",
-            "OG_level_name": "Vertebrata"
-        },
-        "ldo_select_params": {
-            "LDO_selection_method": "alfpy_google_distance"
-        },
-        "align_params": {
-            "align": true,
-            "n_align_threads": 8
-        },
-        "main_output_folder": "./og_construction_output",
-        "write_files": true
-    },
     "sequences": [
         "10020_0:000423",
         "10029_0:0001d8",
@@ -1125,6 +1106,34 @@
         "77115_0:00302b",
         "52670_0:002782"
     ],
-    "alignment_clustered_ldos_file": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/pipeline_single_gene/og_construction_output/alignments/9606_0_002f40_Vertebrata_869863at7742_clustered_ldos_aln.fasta",
-    "alignment_clustered_ldos_file_relative": "og_construction_output/alignments/9606_0_002f40_Vertebrata_869863at7742_clustered_ldos_aln.fasta"
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpl8bc_mf0 -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpl8bc_mf0-cdhit.fa -M 0 -d 0 ",
+    "query_uniprot_id": "Q8TC90",
+    "processing params": {
+        "filter_params": {
+            "min_fraction_shorter_than_query": 0.5
+        },
+        "og_select_params": {
+            "OG_selection_method": "level_name",
+            "OG_level_name": "Vertebrata"
+        },
+        "ldo_select_params": {
+            "LDO_selection_method": "alfpy_google_distance",
+            "_LDO_mafft_exe": "mafft",
+            "_LDO_mafft_additional_args": "",
+            "LDO_mafft_threads": 8
+        },
+        "align_params": {
+            "align": true,
+            "n_align_threads": 8,
+            "_mafft_exe": "mafft",
+            "_mafft_additional_args": ""
+        },
+        "_cd_hit_exe": "cd-hit",
+        "_cd_hit_additional_args": "",
+        "main_output_folder": "processed_odb_groups_output",
+        "write_files": true
+    },
+    "alignment_clustered_ldos_file": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/ex1_single_gene/processed_odb_groups_output/alignments/9606_0_002f40_Vertebrata_869863at7742_clustered_ldos_aln.fasta",
+    "alignment_clustered_ldos_file_relative": "processed_odb_groups_output/alignments/9606_0_002f40_Vertebrata_869863at7742_clustered_ldos_aln.fasta",
+    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpwk5gesql\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpwk5gesql-mafft.fa\""
 }

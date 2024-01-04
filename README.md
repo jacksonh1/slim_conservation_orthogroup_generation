@@ -1,4 +1,10 @@
+# TODO:
+- deal with failures
+- add a way to clear the contents of the output directory if it already exists or warn the user that it already exists
+
+
 # Table of contents
+- [TODO:](#todo)
 - [Table of contents](#table-of-contents)
 - [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
@@ -8,18 +14,14 @@
 - [Advanced stuff](#advanced-stuff)
   - [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data)
   - [advanced configuration](#advanced-configuration)
+    - [clustering and alignment parameters](#clustering-and-alignment-parameters)
+    - [incorporating different aligners](#incorporating-different-aligners)
   - [comments](#comments)
   - [source code](#source-code)
-- [setup (more detailed):](#setup-more-detailed)
-  - [Download this repository](#download-this-repository)
-  - [Download orthoDB database files](#download-orthodb-database-files)
-  - [conda environment](#conda-environment)
-  - [install local tools in environment](#install-local-tools-in-environment)
-  - [generate SQLite databases for orthoDB files](#generate-sqlite-databases-for-orthodb-files)
 
 # orthoDB groups for conservation analysis
-This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream conservation analysis. <br><br>
-- Note: I refer  to these sequences as orthologs at many places throughout this repo but it is probably more accurate to refer to them as homologs. I use the term orthologs because that is what orthoDB calls them. see orthoDB [terminology](https://www.ezlab.org/orthodb_userguide.html#terminology)
+This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream conservation analysis. <br>
+- Note: I refer  to these sequences as orthologs in many places throughout this repo but it is probably more accurate to refer to them as homologs. I use the term orthologs because that is what orthoDB calls them. see orthoDB [terminology](https://www.ezlab.org/orthodb_userguide.html#terminology)
 
 
 ## Pipeline overview:
@@ -36,7 +38,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 6. **Cluster the filtered LDOs using CD-HIT**
 7. **Align the clustered sequences** (uses MAFFT by default)
 8. **output** the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
-    - the group information is output in the form of a json file that can be imported as a python object (see `./examples/` for examples of how to use the object)
+    - the group information is output in the form of a json file that can be imported into python
 
 ### outside resources used (and links):
 - [orthoDB database](https://www.orthodb.org/)
@@ -55,8 +57,10 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 6. activate the environment: `conda activate odb_groups_x86` <br>
 7. install the local package: `pip install .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
+   - *Note: This creates separate databases for each file. You could easily make one database with all of the tables, however I tried this and it was significantly slower to query and I don't know why.* <br>
 
-Check out the longer [setup](#setup-more-detailed) instructions below for more details.
+If you have issues or need more information, check out the [detailed setup instructions](setup_instructions_detailed.md).
+
 
 # Usage
 
@@ -67,7 +71,7 @@ There are different ways to use this pipeline depending on your use case:
 - Or you may want to run the pipeline on all of the proteins in an organism's proteome at different phylogenetic levels and use the output as a database for downstream conservation analysis. <br>
 - examples of both of these use cases are shown in the `./examples/` directory
 
-The main pipeline is executed via the script: `./src/scripts/odb_group_pipeline.py`
+The main pipeline is executed via the script: `./src/local_scripts/odb_group_pipeline.py`
 - This script runs the full pipeline for a single gene (see [pipeline overview](#pipeline-overview)) <br>
     - The gene can be specified using a uniprot ID or an odb_gene_id (see [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data) for more info on these ids)
 - It can be run as a command line script or imported to be used in another script (like if you are running it on a lot of genes). 
@@ -102,7 +106,41 @@ Here is a brief explanation of the ids and how I've refered to them in the code:
       - These correspond with the groups on the website: https://www.orthodb.org/?query=9606_0%3A001c7b
 
 ## advanced configuration
-you can use your own alignment program by changing the `ALIGNER_EXECUTABLE` variable in the `.env` file
+
+### clustering and alignment parameters
+if you have MAFFT and/or CD-HIT installed somewhere else and would prefer to use versions, you can change the `MAFFT_EXECUTABLE` and `CD_HIT_EXECUTABLE` variables in the `.env` file to point to the executables on your computer. <br>
+
+Additionally, you can add additional command line arguments to the MAFFT and CD-HIT commands by editing the `MAFFT_ADDITIONAL_ARGUMENTS` and `CD_HIT_ADDITIONAL_ARGUMENTS` variables in the `.env` file. <br>
+Those variables are set to empty strings by default, but they are inserted into the mafft/cd-hit commands where extra arguments would go:
+- Mafft: `{MAFFT_EXECUTABLE} --thread {n_align_threads} --quiet --anysymbol {MAFFT_ADDITIONAL_ARGUMENTS} {input_file} > {output_alignment}`
+- CD-hit: `{CD_HIT_EXECUTABLE} -i {input_file} -o {output_file} -M 0 -d 0 {CD_HIT_ADDITIONAL_ARGUMENTS}` <br>
+  - Note that for CD-HIT, the default of 90% sequence identity is used, therefore you can change the clustering % identity by providing it to the CD_HIT_ADDITIONAL_ARGUMENTS variable <br>
+  - For example, if you wanted to change the clustering step to cluster the sequences to 80% identity, you would change the `CD_HIT_ADDITIONAL_ARGUMENTS` variable in the `.env` file to `-c 0.8` <br>
+
+Setting these at the environment level is not really ideal if you want these parameters to be flexible.<br>
+
+Therefore, you can also change the MAFFT and CD-HIT commands in the yaml config file (see `./examples/readme.md` for explanation) via some hidden parameters shown in this example:
+```yaml 
+ldo_select_params:
+  _LDO_msa_exe: mafft
+  _LDO_msa_exe_additional_args: --retree 1
+
+align_params:
+  _mafft_exe: mafft
+  _mafft_exe_additional_args: --retree 1
+
+_cd_hit_exe: cd-hit
+_cd_hit_exe_additional_args: -c 0.8
+```
+These parameters are typically set via the variables in the .env file, but that behavior can be overwritten by the config file <br>
+
+### incorporating different aligners
+
+It would be fairly straightforward to incorporate different aligners into the pipeline. <br>
+You would first have to add a new command line script wrapper for the aligner to `./src/local_seqtools/cli_wrappers.py` (There are already some unused functions in there for muscle/clustal). <br>
+Then you could add a new configuration class to configure the aligner in `./src/local_config/conf.py`, and alter the main pipeline script (`./src/local_scripts/odb_group_pipeline.py`) to use the new aligner. <br>
+However, it might be easier to just use the pipeline to generate the ortholog groups align=false (creates just json files) and then run an aligner outside of the pipeline. <br>
+I would just write a script that imports the json file to get the sequence ids of the clustered ldo sequences and then runs the aligner on those sequences. <br>
 
 ## comments
 The main advantages of using these tools:
@@ -125,71 +163,4 @@ I've considered using a config manager like hydra, but it has the same potential
 ## source code
 - see `./src/readme.md` for more info on the source code
 
-# setup (more detailed):
 
-## Download this repository
-```bash
-git clone https://github.com/jacksonh1/orthogroup_generation.git
-```
-
-## Download orthoDB database files
-- download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
-  - I used version 11.0 for my project
-  - The files you need are:
-    - `odb11v0_all_og_fasta.tab.gz`
-    - `odb11v0_levels.tab.gz`
-    - `odb11v0_species.tab.gz`
-    - `odb11v0_level2species.tab.gz`
-    - `odb11v0_genes.tab.gz`
-    - `odb11v0_gene_xrefs.tab.gz`
-    - `odb11v0_OGs.tab.gz`
-    - `odb11v0_OG2genes.tab.gz`
-- Unzip the files (todo: see if you can work with the compressed files instead)
-- create a file called `.env` in this directory (where this README file is located)
-  - or open the `.env` file here if it already exists 
-- Edit the `.env` file with the following:
-  - add a `ORTHODB_DATA_DIR` variable with the absolute path to the directory containing the downloaded files
-  - example `.env` file: 
-```
-ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0/
-```
-- I have included example files in the `./data/orthoDB_sample_data/` directory. These files are from orthoDB version 11.0 and are just subsets of the full files<br>
-- Note: *if you use a different version of orthoDB, you will need to change the file names in `./src/local_env_variables/env_variables.py`. File names are hard coded in the `orthoDB_files_object` class*
-
-## conda environment
-
-Create a conda environment with the necessary packages: <br>
-`conda env create -f environment.yml` <br>
-This will also include CD-HIT and MAFFT from bioconda. <br>
-
-
-## install local tools in environment
-
-**TL;DR**: 
-- activate the environment: `conda activate odb_groups_x86`
-- run `pip install .` in this directory (where `setup.py` file is located) <br>
-
-I wrote this pipeline (code in `./src/`) for it to be installed in the environment as a local package. <br>
-I took inspiration from this example: https://github.com/ericmjl/Network-Analysis-Made-Simple <br>
-combined with information from here: https://setuptools.pypa.io/en/latest/userguide/package_discovery.html <br>
-
-Install the modules/tools as a local package using setuptools. <br>
-first activate the environment: <br>
-`conda activate odb_groups_x86` <br>
-
-Make sure that you are in this directory in terminal (where `setup.py` file is located) and run the following command to install: <br>
-`pip install .` <br>
-
-If you want to make modifications to the src code, you can install it as an editable install. Then you can make changes to the src files and have them be updated in the environment. <br>
-If you want to do this, run the following command instead: <br>
-`pip install -e .` <br><br>
-
-## generate SQLite databases for orthoDB files
-In this directory, run the following command to generate SQLite databases for the orthoDB files: <br>
-```bash
-bash ./prepare_data.sh
-```
-
-Warning - this will take a while to run and I don't think it can be parallelized (Let me know if this is possible because I would love to know how if so). <br>
-
-*Note: I am creating a separate database for each file. You could easily make one database with all of the tables. I tried this but it was significantly slower to query and I don't know why.* <br>

@@ -28,11 +28,11 @@ def load_config(config_file: str | None) -> conf.PipelineParams:
     return config
 
 
-def filter_sequences(min_fraction_short_than_query, query_seqrecord, sequence_dict):
+def filter_sequences(min_fraction_shorter_than_query, query_seqrecord, sequence_dict):
     filtered_sequence_dict = filters.filter_seqs_with_nonaa_chars(
         sequence_dict,
     )
-    min_length = min_fraction_short_than_query* len(query_seqrecord)
+    min_length = min_fraction_shorter_than_query* len(query_seqrecord)
     filtered_sequence_dict = filters.filter_shorter_sequences(
         filtered_sequence_dict,
         min_length=min_length,
@@ -67,7 +67,7 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str):
     query_seqrecord = sequence_dict[odb_gene_id]
 
     filtered_sequence_dict = filter_sequences(
-        config.filter_params.min_fraction_short_than_query,
+        config.filter_params.min_fraction_shorter_than_query,
         query_seqrecord,
         sequence_dict,
     )
@@ -145,7 +145,8 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id: str | None = None, od
     if 'critical error' in output_dict:
         if config.write_files:
             og_info_failure_folder.mkdir(parents=True, exist_ok=True)
-            og_info_json_file = og_info_failure_folder / f'{odb_gene_id}_info.json'
+            og_info_json_file = og_info_failure_folder / f'{uniprot_id}{odb_gene_id}_info.json'
+            save_info_json(output_dict, og_info_json_file)
         raise ValueError(output_dict['critical error'])
     
     output_file_prefix = f'{output_dict["query_odb_gene_id"].replace(":", "_")}_{output_dict["oglevel"]}_{output_dict["ogid"]}'

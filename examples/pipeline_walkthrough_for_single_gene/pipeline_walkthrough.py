@@ -41,11 +41,13 @@
 # %% [markdown]
 # # imports
 
+import local_env_variables.env_variables as env
 # %%
 import pandas as pd
 from Bio import AlignIO, SeqIO
-import local_env_variables.env_variables as env
-from local_orthoDB_group_tools import (sql_queries, filters, uniprotid_search, og_selection, cluster, find_LDOs)
+from local_orthoDB_group_tools import (cluster, filters, find_LDOs,
+                                       og_selection, sql_queries,
+                                       uniprotid_search)
 
 # %load_ext autoreload
 # %autoreload 2
@@ -112,6 +114,7 @@ print(query_seqrecord)
 
 # %%
 import local_orthoDB_group_tools.filters as filters
+
 print(len(sequence_dict))
 filtered_sequence_dict = filters.filter_seqs_with_nonaa_chars(
     sequence_dict,
@@ -185,20 +188,23 @@ print(aln[0:50, 175:220])
 # %% [markdown]
 # # putting it all together
 
+import json
+from pathlib import Path
+
 # %%
 import local_env_variables.env_variables as env
-import json
-from Bio import AlignIO, SeqIO
-from pathlib import Path
-from local_orthoDB_group_tools import (sql_queries, filters, uniprotid_search, og_selection, cluster, find_LDOs)
 import local_seqtools.cli_wrappers as cli_wrappers
-from local_config import conf
 from attrs import asdict
+from Bio import AlignIO, SeqIO
+from local_config import conf
+from local_orthoDB_group_tools import (cluster, filters, find_LDOs,
+                                       og_selection, sql_queries,
+                                       uniprotid_search)
 
 # %%
 processing_params = {
     "filter_params": {
-        "min_fraction_short_than_query": 0.5,
+        "min_fraction_shorter_than_query": 0.5,
     },
     "og_select_params": {
         "OG_selection_method": "level_name",
@@ -233,7 +239,7 @@ query_seqrecord = sequence_dict[odb_gene_id]
 filtered_sequence_dict = filters.filter_seqs_with_nonaa_chars(
     sequence_dict,
 )
-min_length = config.filter_params.min_fraction_short_than_query* len(query_seqrecord)
+min_length = config.filter_params.min_fraction_shorter_than_query* len(query_seqrecord)
 filtered_sequence_dict = filters.filter_shorter_sequences(
     filtered_sequence_dict,
     min_length=min_length,

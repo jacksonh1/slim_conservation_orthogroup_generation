@@ -36,13 +36,13 @@ def addpid_by_msa(
     df_in: pd.DataFrame,
     query_seqrecord: SeqIO.SeqRecord,
     seqrecord_dict: dict[str, SeqIO.SeqRecord],
-    fast_msa: bool = False,
     n_align_threads: int = 8,
+    **mafft_kwargs,
 ) -> pd.DataFrame:
     df = df_in.copy()
     seqrecord_list = [seq for seq in seqrecord_dict.values()]
     _, msa_seqrecord_dict = cli.mafft_align_wrapper(
-        seqrecord_list, fast=fast_msa, n_align_threads=n_align_threads
+        seqrecord_list, n_align_threads=n_align_threads, **mafft_kwargs
     )
     query_msa_seqrecord = msa_seqrecord_dict[query_seqrecord.id] # type: ignore
     # query_msa_seqrecord = [i for i in msa_seqrecord_dict if i.id == query_seqrecord.id][ # type: ignore
