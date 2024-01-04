@@ -726,7 +726,7 @@
         "8932_0:003b96",
         "216574_0:003c68"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp9_08rwv4 -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp9_08rwv4-cdhit.fa -M 0 -d 0 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp6yqam4sa -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp6yqam4sa-cdhit.fa -M 0 -d 0 ",
     "query_uniprot_id": "A0A1U9X8D2",
     "processing params": {
         "filter_params": {

@@ -1,6 +1,7 @@
 # TODO:
-- deal with failures
 - add a way to clear the contents of the output directory if it already exists or warn the user that it already exists
+- make sure you can run the script in a different directory
+- brief explanation of the contents of the json files
 
 
 # Table of contents
@@ -8,16 +9,16 @@
 - [Table of contents](#table-of-contents)
 - [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
-    - [outside resources used (and links):](#outside-resources-used-and-links)
+    - [tools used (and links):](#tools-used-and-links)
 - [setup TL;DR:](#setup-tldr)
 - [Usage](#usage)
-- [Advanced stuff](#advanced-stuff)
-  - [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data)
-  - [advanced configuration](#advanced-configuration)
-    - [clustering and alignment parameters](#clustering-and-alignment-parameters)
-    - [incorporating different aligners](#incorporating-different-aligners)
-  - [comments](#comments)
-  - [source code](#source-code)
+  - [overview](#overview)
+    - [using the tools as a command line script](#using-the-tools-as-a-command-line-script)
+    - [using the tools as a module](#using-the-tools-as-a-module)
+  - [pipeline parameters](#pipeline-parameters)
+    - [pipeline parameters explained](#pipeline-parameters-explained)
+- [comments](#comments)
+- [source code](#source-code)
 
 # orthoDB groups for conservation analysis
 This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream conservation analysis. <br>
@@ -40,7 +41,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 8. **output** the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
     - the group information is output in the form of a json file that can be imported into python
 
-### outside resources used (and links):
+### tools used (and links):
 - [orthoDB database](https://www.orthodb.org/)
 - [MAFFT](https://mafft.cbrc.jp/alignment/software/)
 - [CD-HIT](https://sites.google.com/view/cd-hit)
@@ -57,10 +58,9 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 6. activate the environment: `conda activate odb_groups_x86` <br>
 7. install the local package: `pip install .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
-   - *Note: This creates separate databases for each file. You could easily make one database with all of the tables, however I tried this and it was significantly slower to query and I don't know why.* <br>
+   - *Note: This creates separate databases for each file. You could easily make one database with all of the tables, however I tried this and it was significantly slower to query. I don't know why.* <br>
 
 If you have issues or need more information, check out the [detailed setup instructions](setup_instructions_detailed.md).
-
 
 # Usage
 
@@ -72,77 +72,141 @@ There are different ways to use this pipeline depending on your use case:
 - examples of both of these use cases are shown in the `./examples/` directory
 
 The main pipeline is executed via the script: `./src/local_scripts/odb_group_pipeline.py`
-- This script runs the full pipeline for a single gene (see [pipeline overview](#pipeline-overview)) <br>
-    - The gene can be specified using a uniprot ID or an odb_gene_id (see [brief explanation of the orthoDB data](#brief-explanation-of-the-orthodb-data) for more info on these ids)
 - It can be run as a command line script or imported to be used in another script (like if you are running it on a lot of genes). 
 
-How to use and configure the pipeline is explained in detail in `./examples/readme.md` <br>
+## overview
+The main pipeline is executed via the file `../src/local_scripts/odb_group_pipeline.py`, which runs the pipeline for a single gene. This should be the only file that you need to access run the pipeline<br>
+  - The gene can be specified using a uniprot ID or an odb_gene_id (see *brief explanation of the orthodb data* in [advanced.md](./advanced.md) for more info on the ids used in orthoDB).
+  - it outputs files with the results in json format and alignments in fasta format (if alignment is specified in the parameters). <br>
+The output will look like this:
+```bash
+main_output_folder/
+    ├── info_jsons/
+    │   ├── 9606_0_001c7b_Eukaryota_5471876at2759_info.json
+    │   ├── ...
+    ├── ├── {odb_gene_id}_{og_level}_{og_id}_info.json
+    │---alignments/
+    │   ├── 9606_0_001c7b_Eukaryota_5471876at2759_clustered_ldos_aln.fasta
+    │   ├── ...
+    ├── ├── {odb_gene_id}_{og_level}_{og_id}_clustered_ldos_aln.fasta
 
-# Advanced stuff
-## brief explanation of the orthoDB data
-You can view the readme file that comes with the orthoDB download for more information. <br>
-The data is organized using some internal id numbers. <br>
-Here is a brief explanation of the ids and how I've refered to them in the code:
-- **odb_gene_id**: An internal orthoDB id. It defines a specific protein sequence in the database. The sequences in the fasta file have the orthoDB id as the sequence id. It is not consistent across versions of orthoDB.
-  - example: `9606_0:001c7b`
-  - odb_gene_id's are mapped to a variety of other ids corresponding to outside databases (e.g. uniprot, ensembl, etc.) or they were downloaded from some database and have a corresponding id. This information is stored in the `odb11v0_gene_xrefs.tab`/`odb11v0_genes.tab` files.
-- **og_id**: An internal orthoDB id. It is probably not consistent across versions of orthoDB. It defines a group of homologous sequences. Each phylogenetic level of homologs has a unique og_id. So a single odb_gene_id probably belongs to multiple og_ids.
-  - example og_id: `1567973at7742`
-  - example - all of the og_id's that contain the odb_gene_id `9606_0:001c7b`:
-    - `605262at9347`, `70995at314146`, `5821at9604`, `1742826at33208`, `5821at314295`, `4349at40674`, `1005199at32523`, `1567973at7742`, `5471876at2759`, `70995at9443`
-  - Each of the og_id's is associated with a phylogenetic level at which it was constructed:
-      | OG id          | level name       |   total non-redundant count of species underneath |
-      |:---------------|:-----------------|--------------------------------------------------:|
-      | 5471876at2759  | Eukaryota        |                                              1952 |
-      | 1742826at33208 | Metazoa          |                                               817 |
-      | 1567973at7742  | Vertebrata       |                                               470 |
-      | 1005199at32523 | Tetrapoda        |                                               325 |
-      | 4349at40674    | Mammalia         |                                               191 |
-      | 605262at9347   | Eutheria         |                                               182 |
-      | 70995at314146  | Euarchontoglires |                                                70 |
-      | 70995at9443    | Primates         |                                                30 |
-      | 5821at314295   | Hominoidea       |                                                 7 |
-      | 5821at9604     | Hominidae        |                                                 5 |
-      - These correspond with the groups on the website: https://www.orthodb.org/?query=9606_0%3A001c7b
+```
+The json files contain the information about the ortholog groups and are used for further conservation analysis. <br><br>
+See the [examples](./examples/) folder for example output. <br>
 
-## advanced configuration
+### using the tools as a command line script
 
-### clustering and alignment parameters
-if you have MAFFT and/or CD-HIT installed somewhere else and would prefer to use versions, you can change the `MAFFT_EXECUTABLE` and `CD_HIT_EXECUTABLE` variables in the `.env` file to point to the executables on your computer. <br>
+The easiest way to explain how it works and how to use it is via the command line script help message:
+```bash
+$ python ../src/local_scripts/odb_group_pipeline.py --help
+```
+```
+usage: odb_group_pipeline.py [-h] (-unid <str> | -odbid <str>) [-c <file>]
 
-Additionally, you can add additional command line arguments to the MAFFT and CD-HIT commands by editing the `MAFFT_ADDITIONAL_ARGUMENTS` and `CD_HIT_ADDITIONAL_ARGUMENTS` variables in the `.env` file. <br>
-Those variables are set to empty strings by default, but they are inserted into the mafft/cd-hit commands where extra arguments would go:
-- Mafft: `{MAFFT_EXECUTABLE} --thread {n_align_threads} --quiet --anysymbol {MAFFT_ADDITIONAL_ARGUMENTS} {input_file} > {output_alignment}`
-- CD-hit: `{CD_HIT_EXECUTABLE} -i {input_file} -o {output_file} -M 0 -d 0 {CD_HIT_ADDITIONAL_ARGUMENTS}` <br>
-  - Note that for CD-HIT, the default of 90% sequence identity is used, therefore you can change the clustering % identity by providing it to the CD_HIT_ADDITIONAL_ARGUMENTS variable <br>
-  - For example, if you wanted to change the clustering step to cluster the sequences to 80% identity, you would change the `CD_HIT_ADDITIONAL_ARGUMENTS` variable in the `.env` file to `-c 0.8` <br>
+run main orthoDB group generation pipeline for a single gene
+    processing parameters should be provided in a config file. (-c/--config)
+    if no config file is provided, default parameters will be used
+    The default parameters are:
+- filter_params: {'min_fraction_shorter_than_query': 0.5}
+- og_select_params: {'OG_selection_method': 'level_name', 'OG_level_name': 'Vertebrata'}
+- ldo_select_params: {'LDO_selection_method': 'alfpy_google_distance', 'LDO_mafft_threads': 8}
+- align_params: {'align': False, 'n_align_threads': 8}
+- main_output_folder: ./processed_odb_groups_output
+- write_files: True
 
-Setting these at the environment level is not really ideal if you want these parameters to be flexible.<br>
+options:
+  -h, --help            show this help message and exit
+  -unid <str>, --uniprot_id <str>
+                        the uniprot id of the gene of interest
+  -odbid <str>, --odb_gene_id <str>
+                        the odb gene id of the gene of interest (e.g. "9606_0:001c7b")
+  -c <file>, --config <file>
+                        path to config file, default=None
+```
+- Either `-odbid` or `-unid` must be specified. <br>
+  - This is the "query" sequence that the analysis is centered on (provided by either uniprot id or odb gene id). It is the sequence that you are retrieving orthologs for.<br>
+- The `-c` argument is optional and specifies the location of a configuration file which can be used to specify the pipeline parameters. If it is not specified, the default parameters will be used. <br>
+  - Any of the parameters can be specified in the config file and they will overwrite the defaults. Any parameters absent from the config file will take on the default value. More on what the parameters actually do [below](#pipeline-parameters) <br>
+- see [example 1](./examples/ex1_single_gene/) in the examples folder to see it used as a command line script. <br>
 
-Therefore, you can also change the MAFFT and CD-HIT commands in the yaml config file (see `./examples/readme.md` for explanation) via some hidden parameters shown in this example:
+You would probably very rarely want to run the pipeline as a command line script, but it is useful for testing how the pipeline works or if you wanted to use a workflow manager like snakemake or nextflow. <br>
+
+### using the tools as a module
+
+importing the script as a module is very similar to using it as a command line script, see [example 2](./examples/ex2_table_with_uniprot_ids/) and [example 3](./examples/ex3_all_human_genes/) for examples.
+
+In general you import the script as a module:
+```python
+import local_scripts.odb_group_pipeline as pipeline
+```
+This import should work from anywhere because you installed the src code as a package <br>
+The main function is `pipeline.main_pipeline` but it requires a configuration file to be loaded first (if using any non-default options). <br>
+This is done with the `pipeline.load_config` function:
+```python
+config = pipeline.load_config("./params.yml")
+```
+Then you can run the pipeline with the `pipeline.main_pipeline` function, which takes the `config` object as an argument and either a uniprot id or odb gene id as another argument:
+```python
+pipeline.main_pipeline(config, odb_gene_id="9606_0:002f40")
+```
+or
+```python
+pipeline.main_pipeline(config, uniprot_id="Q8TC90")
+```
+In this way, you can run the pipeline for any number of genes in a script as is shown is example 2 and example 3 <br>
+
+## pipeline parameters
+
+The pipeline parameters are specified in a yaml file. <br>
+If you are not familiar with yaml, it is fairly easy to understand by just looking at an example. Here is an example yaml file:<br>
 ```yaml 
+filter_params:
+  min_fraction_shorter_than_query: 0.5
+
+og_select_params:
+  OG_selection_method: level_name
+  OG_level_name: Vertebrata
+
 ldo_select_params:
-  _LDO_msa_exe: mafft
-  _LDO_msa_exe_additional_args: --retree 1
+  LDO_selection_method: alfpy_google_distance
 
 align_params:
-  _mafft_exe: mafft
-  _mafft_exe_additional_args: --retree 1
+  align: false
+  n_align_threads: 8
 
-_cd_hit_exe: cd-hit
-_cd_hit_exe_additional_args: -c 0.8
+main_output_folder: processed_odb_groups_output
+write_files: true
 ```
-These parameters are typically set via the variables in the .env file, but that behavior can be overwritten by the config file <br>
+More configuration files are used in the examples here so you can also just copy and edit those for your own use (*e.g.* `./examples/ex1_single_gene/params.yml`).
 
-### incorporating different aligners
+### pipeline parameters explained
+Here is an explanation of the parameters and what they do:
+- `filter_params`:
+  - `min_fraction_shorter_than_query`: A number between 0 and 1. Sequences that are shorter than `min_fraction_shorter_than_query`*(`length of query sequence`) will be removed from the group of sequences. <br>Default=0.5
+- `og_select_params`:
+  - `OG_selection_method`: the method for selecting the ortholog groups. Can be one of:
+    - `level_name`: (Default) selects the ortholog groups at a specified taxonomic level
+    - there are no other options currently. I used to have options to select the group based on the number of species in the group, but I didn't think it was very useful. I've left it open to add more options in the future.
+- `ldo_select_params`:
+  - `LDO_selection_method`: the method for selecting the LDOs. Can be one of:
+    - `alfpy_google_distance`: (Default) uses the alfpy package to calculate the google distance between the query sequence and each ortholog sequence. The ortholog sequence with the smallest google distance is selected as the LDO.
+    - `msa`: uses the mafft package to construct 1 multiple sequence alignment all of the ortholog sequences. Then the paralog in each organism with the highest percent identity (PID) to the query sequence is chosen as the LDO.
+    - `msa_by_organism`: Uses the mafft package to construct a separate alignment for each organism in the group, composed of the paralogs in each organism and the query sequence. Then the paralog in each organism with the highest PID to the query sequence is chosen as the LDO.
+    - `pairwise`: Performs a pairwise alignment between the query sequence and each individual ortholog in the group using BioPython. Selects the paralog in each organism with the highest PID to the query sequence is chosen as the LDO.
+    - `LDO_msa_threads`: the number of threads to use for the msa. Default=8. Only used if `LDO_selection_method` is `msa` or `msa_by_organism`.
+- `align_params`:
+  - `align`: whether or not to align the clustered LDOs. Can be one of:
+    - true: (Default) align the LDOs
+    - false: do not align the LDOs
+  - `n_align_threads`: the number of threads to use for alignment. Default=8
+- `main_output_folder`: the folder to write the output files to. Default=`./processed_odb_groups_output`
+- `write_files`: whether or not to write the output files. Can be one of:
+  - true: (Default) write the output files
+  - false: do not write the output files
 
-It would be fairly straightforward to incorporate different aligners into the pipeline. <br>
-You would first have to add a new command line script wrapper for the aligner to `./src/local_seqtools/cli_wrappers.py` (There are already some unused functions in there for muscle/clustal). <br>
-Then you could add a new configuration class to configure the aligner in `./src/local_config/conf.py`, and alter the main pipeline script (`./src/local_scripts/odb_group_pipeline.py`) to use the new aligner. <br>
-However, it might be easier to just use the pipeline to generate the ortholog groups align=false (creates just json files) and then run an aligner outside of the pipeline. <br>
-I would just write a script that imports the json file to get the sequence ids of the clustered ldo sequences and then runs the aligner on those sequences. <br>
+See the [advanced.md](./advanced.md) file for advanced configuration options.
 
-## comments
+# comments
 The main advantages of using these tools:
 - the ability to query the orthoDB files quickly (using SQLite databases)
     - The orthoDB files are very large and it is impractical to access them using normal methods (e.g. loading table into python and filtering based on a column value). The key is to pre-index the columns that you are going to filter on, however, it can't be done using normal text files. So I used SQLite to create databases with indexed columns. It makes the lookup time faster by orders of magnitude. The scripts to create the databases here index the columns that are used for lookups in the pipeline.
@@ -160,7 +224,5 @@ Notes:
 This pipeline could probably benefit from using a workflow manager like snakemake or nextflow. However, I'm not sure if it would be worth the extra effort required for people to understand if they are unfamiliar with those tools. 
 I've considered using a config manager like hydra, but it has the same potential downfall. 
 
-## source code
-- see `./src/readme.md` for more info on the source code
-
-
+# source code
+- see [src/readme.md](./src/readme.md) for more info on how the source code is structured

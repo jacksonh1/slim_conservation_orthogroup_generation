@@ -1106,7 +1106,7 @@
         "77115_0:00302b",
         "52670_0:002782"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpfbc2qfk1 -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpfbc2qfk1-cdhit.fa -M 0 -d 0 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp39n5hdje -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp39n5hdje-cdhit.fa -M 0 -d 0 ",
     "query_uniprot_id": "Q8TC90",
     "processing params": {
         "filter_params": {

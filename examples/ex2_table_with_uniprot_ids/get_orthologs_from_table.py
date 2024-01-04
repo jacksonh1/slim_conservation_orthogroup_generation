@@ -1,5 +1,3 @@
-import local_config.conf as conf
-import local_orthoDB_group_tools.sql_queries as sql_queries
 import local_scripts.odb_group_pipeline as pipeline
 import pandas as pd
 

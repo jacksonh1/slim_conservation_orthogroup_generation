@@ -32,17 +32,16 @@ class OGSelectConf:
     orthogroup selection parameters
 
     Attributes:
-    `OG_selection_method`: Union[str, Literal["most_species", "level_name"]]
+    `OG_selection_method`: Union[str, Literal["level_name"]]
         The method used to select the orthogroup.
         `level_name`: select the orthogroup with the given level name
-        `most_species`: select the orthogroup level with the most species under it
         Default: "level_name"
     `OG_level_name`: str,
         the level name to use if OG_selection_method is "level_name".
         Default: "Vertebrata"
     '''
-    OG_selection_method: Union[str, Literal["most_species", "level_name"]] = field(
-        default="level_name", validator=validators.in_(["most_species", "level_name"])
+    OG_selection_method: Union[str, Literal["level_name"]] = field(
+        default="level_name", validator=validators.in_(["level_name"])
     )
     OG_level_name: str = field(default="Vertebrata")
 
@@ -144,9 +143,5 @@ class PipelineParams:
 #     "write_files": True,
 #     "main_output_folder": "./orthoDB_analysis",
 # }
-# DEFAULT_PARAM_DICT.pop
-
 # config = PipelineParams.from_dict(DEFAULT_PARAM_DICT)
 # print(config)
-# print(config.filter_params.min_fraction_shorter_than_query)
-# print(DEFAULT_PARAM_DICT) 

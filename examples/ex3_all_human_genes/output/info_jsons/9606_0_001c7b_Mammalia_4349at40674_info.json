@@ -570,7 +570,7 @@
         "9361_0:000d26",
         "9708_0:00440b"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpxrdbupjo -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpxrdbupjo-cdhit.fa -M 0 -d 0 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmptx2x15mn -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmptx2x15mn-cdhit.fa -M 0 -d 0 ",
     "query_uniprot_id": "A0A1U9X8D2",
     "processing params": {
         "filter_params": {

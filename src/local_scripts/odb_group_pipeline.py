@@ -63,7 +63,7 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str):
         return results_dict
     
     group_members = sql_queries.ogid_2_odb_gene_id_list(ogid)
-    sequence_dict = env.odb_database.get_sequences_from_list_of_seq_ids(group_members)
+    sequence_dict = env.ODB_DATABASE.get_sequences_from_list_of_seq_ids(group_members)
     query_seqrecord = sequence_dict[odb_gene_id]
 
     filtered_sequence_dict = filter_sequences(
@@ -81,7 +81,7 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str):
         mafft_executable = config.ldo_select_params._LDO_mafft_exe,
         extra_args = config.ldo_select_params._LDO_mafft_additional_args,
     )
-    ldo_seqrecord_dict = env.odb_database.get_sequences_from_list_of_seq_ids(ldos)
+    ldo_seqrecord_dict = env.ODB_DATABASE.get_sequences_from_list_of_seq_ids(ldos)
 
     cdhit_command, clustered_ldo_seqrec_dict = cluster.cdhit_main(
         ldo_seqrecord_dict,
@@ -166,12 +166,13 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id: str | None = None, od
                 SeqIO.write(list(aln.values()), f, 'fasta')
             output_dict['alignment_clustered_ldos_file'] = str(alignment_output_file.resolve())
             output_dict['alignment_clustered_ldos_file_relative'] = str(alignment_output_file.resolve().relative_to(Path.cwd()))
-        output_dict['alignment_clustered_ldos_command'] = mafft_command
+            output_dict['alignment_clustered_ldos_command'] = mafft_command
 
     output_dict['sequences_clustered_ldos'] = list(output_dict['sequences_clustered_ldos'].keys())
     og_info_json_file = og_info_json_folder / f'{output_file_prefix}_info.json'
     if config.write_files:
         save_info_json(output_dict, og_info_json_file)
+    return output_dict
 
 
 if __name__ == "__main__":

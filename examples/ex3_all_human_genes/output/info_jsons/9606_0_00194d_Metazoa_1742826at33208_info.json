@@ -2779,7 +2779,7 @@
         "103695_0:0048c4",
         "216574_0:003c68"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpcmgrecl5 -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpcmgrecl5-cdhit.fa -M 0 -d 0 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp8isf_0xb -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp8isf_0xb-cdhit.fa -M 0 -d 0 ",
     "query_uniprot_id": "",
     "processing params": {
         "filter_params": {

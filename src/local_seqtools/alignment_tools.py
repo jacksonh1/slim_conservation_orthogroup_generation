@@ -164,7 +164,7 @@ def alfpy_distance_matrix(seqrecord_list, word_size=2):
     alf_seq_records = alf_seqrecords.SeqRecords(id_list=id_list, seq_list=seq_str_list)
     p = word_pattern.create(alf_seq_records.seq_list, word_size=word_size)
     # counts = word_vector.Counts(alf_seq_records.length_list, p)
-    freqs = word_vector.Freqs(alf_seq_records.length_list, p) # why is that not used?
+    freqs = word_vector.Freqs(alf_seq_records.length_list, p)
     dist = word_distance.Distance(freqs, 'google')
     matrix = distmatrix.create(alf_seq_records.id_list, dist)
     return matrix
