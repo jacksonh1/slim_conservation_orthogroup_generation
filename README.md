@@ -3,6 +3,7 @@
 - make sure you can run the script in a different directory
 - brief explanation of the contents of the json files
 
+Written by Jackson Halpin <br>
 
 # Table of contents
 - [TODO:](#todo)
