@@ -10,7 +10,7 @@ Written by Jackson Halpin <br>
 - [Table of contents](#table-of-contents)
 - [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
-    - [tools used (and links):](#tools-used-and-links)
+- [necessary background knowledge (beginner level)](#necessary-background-knowledge-beginner-level)
 - [setup TL;DR:](#setup-tldr)
 - [Usage](#usage)
   - [overview](#overview)
@@ -20,6 +20,7 @@ Written by Jackson Halpin <br>
     - [pipeline parameters explained](#pipeline-parameters-explained)
 - [comments](#comments)
 - [source code](#source-code)
+- [tools used (and links):](#tools-used-and-links)
 
 # orthoDB groups for conservation analysis
 This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream conservation analysis. <br>
@@ -42,20 +43,31 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 8. **output** the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
     - the group information is output in the form of a json file that can be imported into python
 
-### tools used (and links):
-- [orthoDB database](https://www.orthodb.org/)
-- [MAFFT](https://mafft.cbrc.jp/alignment/software/)
-- [CD-HIT](https://sites.google.com/view/cd-hit)
-- [alfpy](https://github.com/aziele/alfpy)
-- [BioPython](https://biopython.org/)
-- and other python packages ... see `./environment.yml` for a full list of dependencies
+# necessary background knowledge (beginner level)
+- **basic use of a unix terminal** (i.e. navigating directories, running scripts, etc.). If you are unfamiliar with this, here's where to start:
+  - Make sure you can open a terminal.
+    - **windows** - I recommend using the windows subsystem for linux (WSL) and using the default ubuntu linux distribution (https://learn.microsoft.com/en-us/windows/wsl/install). Note, I know close to nothing about windows, which is why I'm recommending using wsl, which is basically just linux within windows. People who are knowlegable about windows may not have to do this.
+    - **Mac** - you can use the default terminal app under applications/utilities
+    - **Linux** - you probably already know how to use the terminal
+  - do a quick tutorial to get the basics of navigating directories and running scripts.
+    - This one seems good: https://ubuntu.com/tutorials/command-line-for-beginners#1-overview
+    - but there are tons of others out there
+- **a way to manage python environments** (e.g. conda, virtualenv, etc.)
+  - I recommend using conda because it is easy to install and use. To save space I would recommend using miniconda (https://docs.conda.io/projects/miniconda/en/latest/index.html). 
+      - Windows WSL - use the linux version of miniconda, which you can install via the command line (See the "Quick command line install" section on that page.)
+      - here's a quick tutorial on how to use conda: https://conda.io/projects/conda/en/latest/user-guide/getting-started.html
+- **the ability to edit text files**
+  - You can use any editor you want. A lot of people use VSCode. For a simple and lightweight editor, I recommend sublime text to people sometimes. You can also use the default text editor on your computer (TextEdit on Mac, Notepad on Windows, etc.).
 
 # setup TL;DR:
+
 1. download this repository
 2. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
 3. navigate to this downloaded repository in terminal (where this README file is located)
 4. edit the `.env` file with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
-5. create a new environment with the dependencies: `conda env create -f environment.yml` <br>
+5. create a new python environment with the dependencies: 
+   - Mac - `conda env create -f environment.yml` <br>
+   - Linux/windows WSL - `conda env create -f environment_linux.yml` <br>
 6. activate the environment: `conda activate odb_groups_x86` <br>
 7. install the local package: `pip install .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
@@ -227,3 +239,12 @@ I've considered using a config manager like hydra, but it has the same potential
 
 # source code
 - see [src/readme.md](./src/readme.md) for more info on how the source code is structured
+
+# tools used (and links):
+- [orthoDB database](https://www.orthodb.org/)
+- [MAFFT](https://mafft.cbrc.jp/alignment/software/)
+- [CD-HIT](https://sites.google.com/view/cd-hit)
+- [alfpy](https://github.com/aziele/alfpy)
+- [BioPython](https://biopython.org/)
+- and other python packages ... see `./environment.yml` for a full list of dependencies
+
