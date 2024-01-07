@@ -12,15 +12,18 @@ N_CORES = multiprocessing.cpu_count() - 2
 
 
 def multiple_levels(
-    config: conf.PipelineParams, query_odb_gene_ids: str, og_levels: list
+    config: conf.PipelineParams, query_odb_gene_id: str, og_levels: list
 ):
+    '''
+    run the pipeline for a single odb_gene_id for multiple og_levels
+    '''
     for og_level in og_levels:
         config.og_select_params.OG_level_name = og_level
         try:
-            pipeline.main_pipeline(config, odb_gene_id=query_odb_gene_ids)
+            pipeline.main_pipeline(config, odb_gene_id=query_odb_gene_id)
         except ValueError as err:
             # logger.error(f"{query_geneid} - {og_level} - {err}")
-            print(f"{query_odb_gene_ids} - {og_level} - {err}")
+            print(f"{query_odb_gene_id} - {og_level} - {err}")
 
 
 def main(

@@ -22,7 +22,7 @@ In this example, there is a script that runs the pipeline for all of the human g
 
 - `./ex3_all_human_genes/pipeline_all_human_ids_CLI_version.py` is the same script but it is run as a command line script.<br>
 
-Running on the full dataset using 62 cores, this pipeline took a few hours to run and generated around 10 Gb of data. When I ran it with align=True, it generate around 100 Gbs of data. <br>
+Running on the full dataset using 62 cores, this pipeline took a few hours to run and generated around 10 Gb of data. When I ran it with align=True, it generated around 100 Gbs of data. <br>
 
 
 ### `./pipeline_walkthrough_for_single_gene/`:
