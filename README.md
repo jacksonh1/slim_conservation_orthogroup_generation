@@ -1,12 +1,7 @@
-# TODO:
-- add a way to clear the contents of the output directory if it already exists or warn the user that it already exists
-- make sure you can run the script in a different directory
-- brief explanation of the contents of the json files
 
 Written by Jackson Halpin <br>
 
 # Table of contents
-- [TODO:](#todo)
 - [Table of contents](#table-of-contents)
 - [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
