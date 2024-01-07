@@ -30,13 +30,29 @@ ORTHODB_DATA_DIR=/Users/username/project/data/orthodb/odb11v0/
 - Note: *if you use a different version of orthoDB, you will need to change the file names in `./src/local_env_variables/env_variables.py`. File names are hard coded in the `orthoDB_files_object` class*
 
 ## conda environment
+Create a conda environment with the necessary packages using the environment file. It includes CD-HIT and MAFFT from bioconda so you do not have to install these separately. <br>
 
-Create a conda environment with the necessary packages: <br>
+### Mac
+if you have an ARM64 mac (M1/M2) you have to create an x86 environment to install all of the packages at this point in time <br>
+to do so run the following commands:<br>
+```bash
+CONDA_SUBDIR=osx-64 conda create -n odb_groups_x86
+conda activate odb_groups_x86
+conda config --env --set subdir osx-64
+conda update -f=envirenment.yml --name=odb_groups_x86
+```
+if you have an older intel mac, you shouldn't have to use the above commands, you should be able to just run the following command: <br>
 `conda env create -f environment.yml` <br>
-This will also include CD-HIT and MAFFT from bioconda. <br>
-If you are not on a mac, the above command will most likely not work because the exact version numbers are different for different operating systems usually.<br>
-In this case, I would recommend creating the environment from the `./environment_compatible.yml` file (`conda env create -f environment_compatible.yml`). Which has the version numbers removed. <br>
-In the distant future (when updates to packages break things in this pipeline), it may be necessary to include some version numbers in the `environment_compatible.yml` file that will work one any system. I will update this when I figure that out.<br>
+
+### Linux
+`conda env create -f environment_linux.yml` <br>
+
+### Windows WSL (Windows Subsystem for Linux with Ubuntu)
+Use the `environment_linux.yml` file. <br>
+
+### if you have issues with the environment file
+You can try creating the environment from the `./environment_compatible.yml` file (`conda env create -f environment_compatible.yml`). Which has the version numbers removed. <br>
+
 
 ## install local tools in environment
 

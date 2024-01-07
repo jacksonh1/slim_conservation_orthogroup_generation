@@ -62,6 +62,14 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 4. edit the `.env` file with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
 5. create a new python environment with the dependencies: 
    - Mac - `conda env create -f environment.yml` <br>
+       - if you have an ARM64 mac (M1/M2) you have to create an x86 environment to install all of the packages at this point in time
+       - to do so run the following commands:
+          ```bash
+          CONDA_SUBDIR=osx-64 conda create -n odb_groups_x86
+          conda activate odb_groups_x86
+          conda config --env --set subdir osx-64
+          conda update -f=envirenment.yml --name=odb_groups_x86
+          ```
    - Linux/windows WSL - `conda env create -f environment_linux.yml` <br>
 6. activate the environment: `conda activate odb_groups_x86` <br>
 7. install the local package: `pip install .` <br>
