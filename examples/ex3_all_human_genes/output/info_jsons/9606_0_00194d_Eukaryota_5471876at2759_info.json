@@ -2846,7 +2846,7 @@
         "103695_0:0048c4",
         "216574_0:003c68"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp28ioqa8e -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp28ioqa8e-cdhit.fa -M 0 -d 0 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp4mp35qmt -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp4mp35qmt-cdhit.fa -M 0 -d 0 ",
     "species_map": {
         "54969_0:00071d": "Polypedilum nubifer",
         "9606_0:00194d": "Homo sapiens",
@@ -3204,7 +3204,7 @@
             "LDO_mafft_threads": 8
         },
         "align_params": {
-            "align": false,
+            "align": true,
             "n_align_threads": 8,
             "_mafft_exe": "mafft",
             "_mafft_additional_args": ""
@@ -3213,5 +3213,8 @@
         "_cd_hit_additional_args": "",
         "main_output_folder": "output",
         "write_files": true
-    }
+    },
+    "alignment_clustered_ldos_file": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/ex3_all_human_genes/output/alignments/9606_0_00194d_Eukaryota_5471876at2759_clustered_ldos_aln.fasta",
+    "alignment_clustered_ldos_file_relative": "output/alignments/9606_0_00194d_Eukaryota_5471876at2759_clustered_ldos_aln.fasta",
+    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpmsqof4w8\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpmsqof4w8-mafft.fa\""
 }

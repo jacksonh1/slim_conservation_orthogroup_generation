@@ -1106,7 +1106,7 @@
         "77115_0:00302b",
         "52670_0:002782"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpe4taghkl -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpe4taghkl-cdhit.fa -M 0 -d 0 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp85m4s58w -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp85m4s58w-cdhit.fa -M 0 -d 0 ",
     "species_map": {
         "38626_0:002d6b": "Phascolarctos cinereus",
         "9337_0:0036f4": "Trichosurus vulpecula",
@@ -1268,7 +1268,7 @@
             "LDO_mafft_threads": 8
         },
         "align_params": {
-            "align": false,
+            "align": true,
             "n_align_threads": 8,
             "_mafft_exe": "mafft",
             "_mafft_additional_args": ""
@@ -1277,5 +1277,8 @@
         "_cd_hit_additional_args": "",
         "main_output_folder": "output",
         "write_files": true
-    }
+    },
+    "alignment_clustered_ldos_file": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/ex3_all_human_genes/output/alignments/9606_0_002f40_Eukaryota_4642869at2759_clustered_ldos_aln.fasta",
+    "alignment_clustered_ldos_file_relative": "output/alignments/9606_0_002f40_Eukaryota_4642869at2759_clustered_ldos_aln.fasta",
+    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpmrqtvpie\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpmrqtvpie-mafft.fa\""
 }

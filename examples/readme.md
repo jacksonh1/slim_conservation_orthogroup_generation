@@ -20,7 +20,7 @@ In this example, there is a script that runs the pipeline for all of the human g
     - note, that if it is not explicitly defined, the default is used.
 - I also included a check to make sure that the specified output directory doesn't already exist. If it does, the script will exit. This is to prevent overwriting data. <br>
 
-- `./ex3_all_human_genes/pipeline_all_human_ids_CLI_version.py` is the same script but it is run as a command line script.<br>
+- `./ex3_all_human_genes/pipeline_all_human_ids_CLI_version.py` is the same script but it is run as a command line script. I included this as a separate script because I am afraid that the argparse stuff could confuse new users<br>
 
 Running on the full dataset using 62 cores, this pipeline took a few hours to run and generated around 10 Gb of data. When I ran it with align=True, it generated around 100 Gbs of data. <br>
 
