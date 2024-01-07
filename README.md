@@ -87,6 +87,8 @@ There are different ways to use this pipeline depending on your use case:
 The main pipeline is executed via the script: `./src/local_scripts/odb_group_pipeline.py`
 - It can be run as a command line script or imported to be used in another script (like if you are running it on a lot of genes). 
 
+Because the src code is installed as a package, you can import the tools from anywhere. Meaning you can run the main pipeline from anywhere on your computer as long as you have activated the environment (i.e. you're not stuck in this directory). <br>
+
 ## overview
 The main pipeline is executed via the file `../src/local_scripts/odb_group_pipeline.py`, which runs the pipeline for a single gene. This should be the only file that you need to access run the pipeline<br>
   - The gene can be specified using a uniprot ID or an odb_gene_id (see *brief explanation of the orthodb data* in [advanced.md](./advanced.md) for more info on the ids used in orthoDB).

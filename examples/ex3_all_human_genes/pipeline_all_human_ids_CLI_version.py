@@ -1,3 +1,4 @@
+import argparse
 import multiprocessing
 import shutil
 from pathlib import Path
@@ -7,8 +8,7 @@ import local_orthoDB_group_tools.sql_queries as sql_queries
 import local_scripts.odb_group_pipeline as pipeline
 
 SPECIES_ID = "9606_0"
-N_CORES = multiprocessing.cpu_count()-2
-OVERWRITE = False
+N_CORES = multiprocessing.cpu_count() - 2
 
 
 def multiple_levels(
@@ -52,12 +52,47 @@ def main(
 
 if __name__ == "__main__":
     og_levels = ["Eukaryota", "Mammalia", "Metazoa", "Tetrapoda", "Vertebrata"]
-    config = pipeline.load_config("./params.yml")
+    parser = argparse.ArgumentParser(
+        description="run the pipeline for all genes in an organism",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        metavar="<file>",
+        default=None,
+        help="""path to config file""",
+    )
+    parser.add_argument(
+        "-n",
+        "--n_cores",
+        type=int,
+        metavar="<int>",
+        default=N_CORES,
+        help=f"""number of cores to use""",
+    )
+    parser.add_argument(
+        "-s",
+        "--species_id",
+        type=str,
+        metavar="<str>",
+        default=SPECIES_ID,
+        help=f"""species id to use""",
+    )
+    parser.add_argument(
+        "-o",
+        "--overwrite",
+        action="store_true",
+        help="""if flag is provided and the main_output_folder exists, it will be removed and overwritten by the new files. Otherwise, an error will be raised if the folder exists""",
+    )
+    args = parser.parse_args()
+    config = pipeline.load_config(args.config)
     main(
         config,
         og_levels,
         multiprocess=True,
-        species_id=SPECIES_ID,
-        n_cores=N_CORES,
-        overwrite=OVERWRITE,
+        species_id=args.species_id,
+        n_cores=args.n_cores,
+        overwrite=args.overwrite,
     )

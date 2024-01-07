@@ -4,7 +4,6 @@ import argparse
 import copy
 import json
 from pathlib import Path
-from typing import Literal, Optional, Union
 
 import yaml
 from attrs import asdict
@@ -27,6 +26,12 @@ def load_config(config_file: str | None) -> conf.PipelineParams:
         config = conf.PipelineParams.from_dict(config_dict)
     return config
 
+def generate_species_map(odb_gene_id_list: list[str]):
+    species_map = {}
+    for odb_gene_id in odb_gene_id_list:
+        species_id = sql_queries.odb_gene_id_2_species_id(odb_gene_id)
+        species_map[odb_gene_id] = env.ODB_DATABASE.data_species_dict[species_id]
+    return species_map
 
 def filter_sequences(min_fraction_shorter_than_query, query_seqrecord, sequence_dict):
     filtered_sequence_dict = filters.filter_seqs_with_nonaa_chars(
@@ -48,10 +53,22 @@ def save_info_json(output_dict: dict, output_file: str|Path):
         json.dump(output_dict, f, indent=4)
 
 
-def _pipeline(config: conf.PipelineParams, odb_gene_id: str):
-    '''
-    return filename and dict
-    '''
+def _pipeline(config: conf.PipelineParams, odb_gene_id: str) -> dict:
+    """runs the pipeline for a odb_gene_id. This isn't meant to be called directly,
+    Instead, use pipeline_from_uniprot_id or pipeline_from_odb_gene_id.
+
+    Parameters
+    ----------
+    config : conf.PipelineParams
+        pipeline parameters 
+    odb_gene_id : str
+        the orthoDB gene id of the gene of interest (e.g. "9606_0:001c7b")
+
+    Returns
+    -------
+    dict
+        the results of the pipeline in a dictionary
+    """    
     results_dict = {}
     try:
         ogid, oglevel = og_selection.select_OG_by_level_name(
@@ -72,7 +89,6 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str):
         sequence_dict,
     )
 
-    # need to add a parameter for the number of threads to use for an msa
     pid_df, ldos = find_LDOs.find_LDOs_main(
         seqrecord_dict = filtered_sequence_dict,
         query_seqrecord = query_seqrecord,
@@ -99,11 +115,11 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str):
     results_dict['sequences_ldos'] = list(ldo_seqrecord_dict.keys())
     results_dict['sequences_clustered_ldos'] = clustered_ldo_seqrec_dict
     results_dict['cdhit_command'] = cdhit_command
+    results_dict['species_map'] = generate_species_map(list(clustered_ldo_seqrec_dict.keys()))
     return results_dict
 
 
 def pipeline_from_uniprot_id(config: conf.PipelineParams, uniprot_id: str):
-    og_info_json_folder = Path(config.main_output_folder) / 'info_jsons'
     try:
         odb_gene_id = uniprotid_search.uniprotid_2_odb_gene_id(uniprot_id)
     except ValueError as e:
@@ -124,13 +140,30 @@ def pipeline_from_odb_gene_id(config: conf.PipelineParams, odb_gene_id: str):
 
 
 def main_pipeline(config: conf.PipelineParams, uniprot_id: str | None = None, odb_gene_id: str | None = None):
-    '''
-    load config
-    run either pipeline_from_uniprot_id or pipeline_from_odb_gene_id depending on which is provided
-    if write_files is True and there is a critical error, save the output dict to a separate folder
-    if align is True, align the clustered ldos
-    if write_files is True, save the output dict to a separate folder
-    '''
+    """run the main pipeline for a single gene. Either uniprot_id or odb_gene_id must be provided
+
+    Parameters
+    ----------
+    config : conf.PipelineParams
+        pipeline parameters in a PipelineParams object
+    uniprot_id : str | None, optional
+        uniprot id of the query protein. If not provided, then `odb_gene_id` must be provided, by default None
+    odb_gene_id : str | None, optional
+        orthoDB gene id of the query protein. If not provided, then `uniprot_id` must be provided, by default None
+
+    Returns
+    -------
+    dict
+        the pipeline results in a dictionary
+
+    Raises
+    ------
+    ValueError
+        raises a ValueError if neither `uniprot_id` nor `odb_gene_id` are provided
+    ValueError
+        raises a ValueError if there is a "critical error" in the pipeline
+        When the pipeline is run, errors are stored in the output dictionary under the key "critical error". This error is raised if it exists
+    """    
     if odb_gene_id is not None:
         output_dict = pipeline_from_odb_gene_id(config, odb_gene_id) # type: ignore
     elif uniprot_id is not None:
@@ -141,7 +174,7 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id: str | None = None, od
     output_dict['processing params'] = asdict(config)
     og_info_json_folder = Path(config.main_output_folder) / 'info_jsons'
     og_info_failure_folder = og_info_json_folder / 'failures'
-
+    
     if 'critical error' in output_dict:
         if config.write_files:
             og_info_failure_folder.mkdir(parents=True, exist_ok=True)
@@ -178,7 +211,8 @@ def main_pipeline(config: conf.PipelineParams, uniprot_id: str | None = None, od
 if __name__ == "__main__":
     # get the default parameters just to print them in the help message
     # this is a bit hacky but it works
-    # filter out the private attributes (those that start with '_') because they cannot be modified in the config file
+    # filter out the private attributes (those that start with '_') because they
+    # are more advanced and probably won't be used by most users
     d_params = ''
     for k,v in asdict(conf.PipelineParams(), filter=lambda attr, value: not str(attr.name).startswith('_')).items():
         d_params += f'- {k}: {v}\n'
