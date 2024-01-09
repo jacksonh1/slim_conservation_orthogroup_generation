@@ -93,7 +93,7 @@ The main pipeline is executed via the script: `./src/local_scripts/odb_group_pip
 Because the src code is installed as a package, you can import the tools from anywhere. Meaning you can run the main pipeline from anywhere on your computer as long as you have activated the environment (i.e. you're not stuck in this directory). <br>
 
 ## overview
-The main pipeline is executed via the file `../src/local_scripts/odb_group_pipeline.py`, which runs the pipeline for a single gene. This should be the only file that you need to access run the pipeline<br>
+The main pipeline is executed via the file `./src/local_scripts/odb_group_pipeline.py`, which runs the pipeline for a single gene. This should be the only file that you need to access run the pipeline<br>
   - The gene can be specified using a uniprot ID or an odb_gene_id (see *brief explanation of the orthodb data* in [advanced.md](./advanced.md) for more info on the ids used in orthoDB).
   - it outputs files with the results in json format and alignments in fasta format (if alignment is specified in the parameters). <br>
 The output will look like this:
@@ -109,14 +109,18 @@ main_output_folder/
     ├── ├── {odb_gene_id}_{og_level}_{og_id}_clustered_ldos_aln.fasta
 
 ```
-The json files contain the information about the ortholog groups and are used for further conservation analysis. <br><br>
+The json files contain information about the ortholog groups<br><br>
 See the [examples](./examples/) folder for example output. <br>
+
+The script `./src/local_scripts/create_filemap.py` is intended to be run after the main pipeline. It just creates a json file that maps the odb_gene_ids to the generated files.
+
+See `./examples/ex3_all_human_genes/` to see this.
 
 ### using the tools as a command line script
 
 The easiest way to explain how it works and how to use it is via the command line script help message:
 ```bash
-$ python ../src/local_scripts/odb_group_pipeline.py --help
+$ python ./src/local_scripts/odb_group_pipeline.py --help
 ```
 ```
 usage: odb_group_pipeline.py [-h] (-unid <str> | -odbid <str>) [-c <file>]
