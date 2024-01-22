@@ -23,7 +23,7 @@ CD_HIT_ADDITIONAL_ARGUMENTS = os.environ['CD_HIT_ADDITIONAL_ARGUMENTS']
 
 @frozen
 class orthoDB_files_object:
-    all_seqs_fasta: str = str(orthodb_dir / "odb11v0_all_og.fasta")
+    all_seqs_fasta: str = str(orthodb_dir / "odb11v0_all_og_fasta.tab")
     all_seqs_sqlite: str = str(orthodb_dir / "odb11v0_all_og.sqlite")
     gene_refs_tsv: str = str(orthodb_dir / "odb11v0_genes.tab")
     gene_refs_sqlite: str = str(orthodb_dir / "odb11v0_genes.sqlite")
