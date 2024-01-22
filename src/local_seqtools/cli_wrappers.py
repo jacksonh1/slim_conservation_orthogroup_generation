@@ -17,6 +17,7 @@ def mafft_align_wrapper(
     mafft_executable: str = env.MAFFT_EXECUTABLE,
     extra_args: str = env.MAFFT_ADDITIONAL_ARGUMENTS,
     n_align_threads: int = 8,
+    output_format: str = "dict",
 ) -> tuple[str, dict[str, SeqIO.SeqRecord]]:
     # example extra_args: "--retree 1"
     # create temporary file
@@ -33,7 +34,7 @@ def mafft_align_wrapper(
         mafft_command = f'{mafft_executable} --thread {n_align_threads} --quiet --anysymbol {extra_args} "{temp_file.name}" > "{alignment_filename}"'
     # print(mafft_command)
     subprocess.run(mafft_command, shell=True, check=True)
-    mafft_output = tools.import_fasta(alignment_filename, output_format="dict")
+    mafft_output = tools.import_fasta(alignment_filename, output_format=output_format)
     # delete temporary file
     os.remove(alignment_filename)
     os.remove(temp_file.name)

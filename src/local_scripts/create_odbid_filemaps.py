@@ -1,21 +1,5 @@
 '''
-run this after the pipeline to create a json file that maps the gene ids to the files output by the pipeline
-
-will create a file looking like:
-{
-    "odb_gene_id": {
-        "Eukaryota": {
-            "alignment_file": "path/to/file",
-            "info_file": "path/to/file",
-        },
-        "Vertebrata": {
-            "alignment_file": "path/to/file",
-            "info_file": "path/to/file",
-        },
-        ...
-    },
-    ...
-}
+combines json files into one file for each level
 '''
 
 import argparse
@@ -38,7 +22,7 @@ def get_map_info_from_json(json_file: str|Path) -> tuple[str, str, str]:
     return odb_gene_id, aln_file, level
 
 
-def create_filemap(main_output_folder: str|Path, output_file: str|Path):
+def create_filemap(main_output_folder: str|Path):
     json_dir = Path(main_output_folder) / 'info_jsons'
     json_files = get_json_file_list(json_dir)
     file_map = {}
@@ -51,18 +35,34 @@ def create_filemap(main_output_folder: str|Path, output_file: str|Path):
         file_map[odb_gene_id][level] = {}
         file_map[odb_gene_id][level]['alignment_file'] = aln_file
         file_map[odb_gene_id][level]['info_file'] = str(json_file.resolve())
-    with open(output_file, 'w') as f:
-        json.dump(file_map, f, indent=4)
+    return file_map
+
+
+def write_filemaps(file_map: dict, output_dir: str|Path):
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for odb_gene_id in file_map:
+        output_file = output_dir / f'{odb_gene_id.replace(":", "_")}.json'
+        export_dict = {}
+        export_dict["gene_id"] = odb_gene_id
+        export_dict["levels"] = file_map[odb_gene_id]
+        with open(output_file, 'w') as f:
+            json.dump(export_dict, f, indent=4)
+
+
+def main(main_output_folder: str|Path, output_dir: str|Path):
+    file_map = create_filemap(main_output_folder)
+    write_filemaps(file_map, output_dir)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='''
-run this after the pipeline to create a single json file that maps the gene ids to the files output by the pipeline
-creates a json file mapping odb gene ids to the files output by the pipeline
-will create a file looking like:
+run this after the pipeline to create a json file for each odb gene id that maps the gene id to the files output by the pipeline
+each file will have the following structure:
 {
-    "odb_gene_id": {
+    "gene_id": "odb_gene_id",
+    "levels": {
         "Eukaryota": {
             "alignment_file": "path/to/file",
             "info_file": "path/to/file",
@@ -70,10 +70,8 @@ will create a file looking like:
         "Vertebrata": {
             "alignment_file": "path/to/file",
             "info_file": "path/to/file",
-        },
-        ...
-    },
-    ...
+        }
+    }
 }''',
         formatter_class = argparse.RawTextHelpFormatter
     )
@@ -83,12 +81,12 @@ will create a file looking like:
         help='The main pipeline output folder. The folder should contain the folder `info_jsons/`, where it will look for the json files.'
     )
     parser.add_argument(
-        '--output_file',
+        '--output_directory',
         required=True,
-        help='path of the output json file'
+        help='directory where the output json file maps will be written'
     )
     args = parser.parse_args()
-    create_filemap(args.main_output_folder, args.output_file)
+    main(args.main_output_folder, args.output_directory)
 
 
 

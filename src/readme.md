@@ -18,6 +18,7 @@
 
 ## `local_scripts/`
 - contains the main script for running the pipeline (`odb_group_pipeline.py`), which also handles importing the pipeline parameters
+- also contains some scripts for generating a file that maps the generated files to the odb gene ids. These are optional and not really utilized currently but may aid in some analysis so I'm leaving them in the repo for now.
 
 
 

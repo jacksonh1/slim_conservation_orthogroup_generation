@@ -3,10 +3,10 @@
 This is the way that I've used the pipeline mostly. I generated groups of filtered, clustered, least divergent orthologs (LDOs) for all of the human genes and then accessed the output files for further conservation analysis later. <br>
 In this way I used this output as a database of alignments to annotate tables with conservation scores.
 
-You could run the script with the command `python ./pipeline_all_human_ids.py` or use the command line interface version of the script `python ./pipeline_all_human_ids_CLI_version.py`. I'll assume that you're using the command line version.
+You could run the script with the command `python ./pipeline_all_ids_in_species.py` or use the command line interface version of the script `python ./pipeline_all_ids_in_species_CLI_version.py`. I'll assume that you're using the command line version.
 
 to see the command line parameters:
-`$python pipeline_all_human_ids_CLI_version.py --help`
+`$python pipeline_all_ids_in_species_CLI_version.py --help`
 ```
 run the pipeline for all genes in an organism
 
@@ -23,7 +23,7 @@ options:
 ```
 
 if you are running on a workstation, I would run it using nohup and save the output to a file like this:
-`nohup python ./pipeline_all_human_ids_CLI_version.py -c "./params.yml" --species_id "9606_0" > pipeline_all_human_ids.out &`
+`nohup python ./pipeline_all_ids_in_species_CLI_version.py -c "./params.yml" --species_id "9606_0" > pipeline_all_ids_in_species.out &`
 
 If using a cluster, I would specifiy the number of cores to use in the script with the `--n_cores` parameter
 
