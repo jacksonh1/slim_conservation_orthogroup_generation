@@ -12,7 +12,7 @@ def map_uniprot_id(table: pd.DataFrame, uniprotid_column_name: str = 'uniprot_id
             id_map[uniprot_id] = uniprotid_search.uniprotid_2_odb_gene_id(uniprot_id)
         except ValueError:
             continue
-    table['odb_gene_id'] = table[uniprotid_column_name].map(id_map)
+    table['gene_id'] = table[uniprotid_column_name].map(id_map)
     return table
 
 

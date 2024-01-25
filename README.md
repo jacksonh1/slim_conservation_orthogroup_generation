@@ -18,7 +18,7 @@ Written by Jackson Halpin <br>
 - [tools used (and links):](#tools-used-and-links)
 
 # orthoDB groups for conservation analysis
-This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream conservation analysis. <br>
+This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream [conservation analysis](https://github.com/jacksonh1/motif_conservation_in_IDRs). <br>
 - Note: I refer  to these sequences as orthologs in many places throughout this repo but it is probably more accurate to refer to them as homologs. I use the term orthologs because that is what orthoDB calls them. see orthoDB [terminology](https://www.ezlab.org/orthodb_userguide.html#terminology)
 
 
@@ -72,7 +72,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
           ```
    - Linux/windows WSL - `conda env create -f environment_linux.yml` <br>
 6. activate the environment: `conda activate odb_groups_x86` <br>
-7. install the local package: `pip install .` <br>
+7. install the local package: `pip install -e .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
    - *Note: This creates separate databases for each file. You could easily make one database with all of the tables, however I tried this and it was significantly slower to query. I don't know why.* <br>
 
