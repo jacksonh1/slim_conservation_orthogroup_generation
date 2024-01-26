@@ -5,7 +5,7 @@ import pandas as pd
 from alfpy.utils import distmatrix
 from Bio import SeqIO
 
-import local_orthoDB_group_tools.sql_queries as sql_queries
+import local_orthoDB_group_pipeline.sql_queries as sql_queries
 import local_seqtools.alignment_tools as aln_tools
 import local_seqtools.cli_wrappers as cli
 

@@ -10,7 +10,7 @@
 ## `local_config/`
 - contains code for structuring the pipeline parameters and setting their default and allowed values
 
-## `local_orthoDB_group_tools/`
+## `local_orthoDB_group_pipeline/`
 - contains the main code for each individual step of the pipeline, stored in separate files
 
 ## `local_seqtools/`

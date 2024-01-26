@@ -11,26 +11,27 @@ from Bio import SeqIO
 
 import local_env_variables.env_variables as env
 import local_seqtools.cli_wrappers as cli_wrappers
-from local_config import conf
-from local_orthoDB_group_tools import (cluster, filters, find_LDOs,
-                                       og_selection, sql_queries,
-                                       uniprotid_search)
+from local_config import orthodb_pipeline_parameters
+from local_orthoDB_group_pipeline import (cluster, filters, find_LDOs,
+                                          og_selection, sql_queries,
+                                          uniprotid_search)
 
+ODB_DATABASE = env.orthoDB_database()
 
-def load_config(config_file: str | None) -> conf.PipelineParams:
+def load_config(config_file: str | None) -> orthodb_pipeline_parameters.PipelineParams:
     if config_file is None:
-        config = conf.PipelineParams()
+        config = orthodb_pipeline_parameters.PipelineParams()
     else:
         with open(config_file, 'r') as f:
             config_dict = yaml.safe_load(f)
-        config = conf.PipelineParams.from_dict(config_dict)
+        config = orthodb_pipeline_parameters.PipelineParams.from_dict(config_dict)
     return config
 
 def generate_species_map(odb_gene_id_list: list[str]):
     species_map = {}
     for odb_gene_id in odb_gene_id_list:
         species_id = sql_queries.odb_gene_id_2_species_id(odb_gene_id)
-        species_map[odb_gene_id] = env.ODB_DATABASE.data_species_dict[species_id]
+        species_map[odb_gene_id] = ODB_DATABASE.data_species_dict[species_id]
     return species_map
 
 def filter_sequences(min_fraction_shorter_than_query, query_seqrecord, sequence_dict):
@@ -53,7 +54,7 @@ def save_info_json(output_dict: dict, output_file: str|Path):
         json.dump(output_dict, f, indent=4)
 
 
-def _pipeline(config: conf.PipelineParams, odb_gene_id: str) -> dict:
+def _pipeline(config: orthodb_pipeline_parameters.PipelineParams, odb_gene_id: str) -> dict:
     """runs the pipeline for a odb_gene_id. This isn't meant to be called directly,
     Instead, use pipeline_from_uniprot_id or pipeline_from_odb_gene_id.
 
@@ -80,7 +81,7 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str) -> dict:
         return results_dict
     
     group_members = sql_queries.ogid_2_odb_gene_id_list(ogid)
-    sequence_dict = env.ODB_DATABASE.get_sequences_from_list_of_seq_ids(group_members)
+    sequence_dict = ODB_DATABASE.get_sequences_from_list_of_seq_ids(group_members)
     query_seqrecord = sequence_dict[odb_gene_id]
 
     filtered_sequence_dict = filter_sequences(
@@ -97,7 +98,7 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str) -> dict:
         mafft_executable = config.ldo_select_params._LDO_mafft_exe,
         extra_args = config.ldo_select_params._LDO_mafft_additional_args,
     )
-    ldo_seqrecord_dict = env.ODB_DATABASE.get_sequences_from_list_of_seq_ids(ldos)
+    ldo_seqrecord_dict = ODB_DATABASE.get_sequences_from_list_of_seq_ids(ldos)
 
     cdhit_command, clustered_ldo_seqrec_dict = cluster.cdhit_main(
         ldo_seqrecord_dict,
@@ -119,7 +120,7 @@ def _pipeline(config: conf.PipelineParams, odb_gene_id: str) -> dict:
     return results_dict
 
 
-def pipeline_from_uniprot_id(config: conf.PipelineParams, uniprot_id: str):
+def pipeline_from_uniprot_id(config: orthodb_pipeline_parameters.PipelineParams, uniprot_id: str):
     try:
         odb_gene_id = uniprotid_search.uniprotid_2_odb_gene_id(uniprot_id)
     except ValueError as e:
@@ -132,14 +133,14 @@ def pipeline_from_uniprot_id(config: conf.PipelineParams, uniprot_id: str):
     return output_dict
 
 
-def pipeline_from_odb_gene_id(config: conf.PipelineParams, odb_gene_id: str):
+def pipeline_from_odb_gene_id(config: orthodb_pipeline_parameters.PipelineParams, odb_gene_id: str):
     query_uniprot_id = sql_queries.odb_gene_id_2_uniprotid(odb_gene_id)
     output_dict = _pipeline(config, odb_gene_id)
     output_dict['query_uniprot_id'] = query_uniprot_id
     return output_dict
 
 
-def main_pipeline(config: conf.PipelineParams, uniprot_id: str | None = None, odb_gene_id: str | None = None):
+def main_pipeline(config: orthodb_pipeline_parameters.PipelineParams, uniprot_id: str | None = None, odb_gene_id: str | None = None):
     """run the main pipeline for a single gene. Either uniprot_id or odb_gene_id must be provided
 
     Parameters
@@ -215,7 +216,7 @@ if __name__ == "__main__":
     # filter out the private attributes (those that start with '_') because they
     # are more advanced and probably won't be used by most users
     d_params = ''
-    for k,v in asdict(conf.PipelineParams(), filter=lambda attr, value: not str(attr.name).startswith('_')).items():
+    for k,v in asdict(orthodb_pipeline_parameters.PipelineParams(), filter=lambda attr, value: not str(attr.name).startswith('_')).items():
         d_params += f'- {k}: {v}\n'
 
     parser = argparse.ArgumentParser(

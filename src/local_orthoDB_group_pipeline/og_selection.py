@@ -2,8 +2,9 @@
 import pandas as pd
 
 import local_env_variables.env_variables as env
-import local_orthoDB_group_tools.sql_queries as sql_queries
+import local_orthoDB_group_pipeline.sql_queries as sql_queries
 
+ODB_DATABASE = env.orthoDB_database()
 
 def _ogid_list_2_og_info_df(ogid_list: list[str]) -> pd.DataFrame:
     og_query_results = []
@@ -20,7 +21,7 @@ def ogid_list_2_og_level_info_df(ogid_list: list[str]) -> pd.DataFrame:
     """get info about the list of OGs available for the selected geneid"""
     query_og_df = _ogid_list_2_og_info_df(ogid_list)
     query_available_OGs_info_df = pd.merge(
-        query_og_df, env.ODB_DATABASE.data_levels_df, on="level NCBI tax id", how="left"
+        query_og_df, ODB_DATABASE.data_levels_df, on="level NCBI tax id", how="left"
     )
     query_available_OGs_info_df = query_available_OGs_info_df[
         [

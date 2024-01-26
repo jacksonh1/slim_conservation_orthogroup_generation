@@ -18,7 +18,7 @@ In this example, a table with a column of uniprot ids is imported and ortholog g
 In this example, there is a script that runs the pipeline for all of the human genes in the database. It is more complex than the last one to show how I would implement the pipeline in a more complex scenario. <br>
 - pipeline is imported and used in a script `./ex3_all_human_genes/pipeline_all_ids_in_species.py`
 - uses multiprocessing
-- accesses the `src/local_orthoDB_group_tools/sql_queries.py` tools to retrieve all of the human odb_gene_ids to run the pipeline on.
+- accesses the `src/local_orthoDB_group_pipeline/sql_queries.py` tools to retrieve all of the human odb_gene_ids to run the pipeline on.
 - dynamically modifies the pipeline parameters object in the script to change the ortholog level. In the `multiple_levels` function, the level is changed and the pipeline is run for each level via this line: `config.og_select_params.OG_level_name = og_level`
     - I want to show that the config file is imported as an object and its attributes can be changed programatically.
     - note, that if it is not explicitly defined, the default is used.

@@ -120,7 +120,7 @@ class orthoDB_database:
 
 
 # make the orthoDB_database object available as a global environment variable
-ODB_DATABASE = orthoDB_database()
+# ODB_DATABASE = orthoDB_database()
 
 # Below is an attempt to deal with the fact that the orthoDB file names might change with different versions
 # file_wildcards = {

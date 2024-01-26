@@ -1,5 +1,5 @@
 import pandas as pd
-from local_orthoDB_group_tools import uniprotid_search
+from local_orthoDB_group_pipeline import uniprotid_search
 import argparse
 from pathlib import Path
 

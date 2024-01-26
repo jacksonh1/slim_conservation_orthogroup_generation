@@ -1,5 +1,5 @@
 import local_env_variables.env_variables as env
-import local_orthoDB_group_tools.sql_queries as sql_queries
+import local_orthoDB_group_pipeline.sql_queries as sql_queries
 
 
 def uniprotid_2_odb_gene_id(
