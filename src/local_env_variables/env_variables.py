@@ -8,9 +8,8 @@ import pandas as pd
 from attrs import frozen
 from Bio import SeqIO
 
-# from pyprojroot import here
-dotenv.load_dotenv()
-# dotenv.find_dotenv()
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv.load_dotenv(dotenv_path)
 orthodb_dir = Path(os.environ['ORTHODB_DATA_DIR'])
 MAFFT_EXECUTABLE = os.environ['MAFFT_EXECUTABLE']
 MAFFT_ADDITIONAL_ARGUMENTS = os.environ['MAFFT_ADDITIONAL_ARGUMENTS']
