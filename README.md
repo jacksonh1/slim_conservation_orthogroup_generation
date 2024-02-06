@@ -11,6 +11,7 @@ Written by Jackson Halpin <br>
   - [overview](#overview)
     - [using the tools as a command line script](#using-the-tools-as-a-command-line-script)
     - [using the tools as a module](#using-the-tools-as-a-module)
+    - [useful scripts: `./src/local_scripts/`](#useful-scripts-srclocal_scripts)
   - [pipeline parameters](#pipeline-parameters)
     - [pipeline parameters explained](#pipeline-parameters-explained)
 - [comments](#comments)
@@ -59,7 +60,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 1. download this repository
 2. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
 3. navigate to this downloaded repository in terminal (where this README file is located)
-4. edit the `.env` file with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
+4. edit the file `./src/local_env_variables/.env` with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
 5. create a new python environment with the dependencies: 
    - Mac - `conda env create -f environment.yml` <br>
        - if you have an ARM64 mac (M1/M2) you have to create an x86 environment to install all of the packages at this point in time
@@ -176,6 +177,23 @@ or
 pipeline.main_pipeline(config, uniprot_id="Q8TC90")
 ```
 In this way, you can run the pipeline for any number of genes in a script as is shown is example 2 and example 3 <br>
+
+### useful scripts: `./src/local_scripts/`
+
+- `map_uniprotid.py`: maps uniprot ids to orthoDB gene ids in an input table. <br>
+    - outputs a new table with the orthoDB gene ids added as a new column
+- `odb_group_pipeline.py`: the main pipeline. (described above) <br>
+- `pipeline_all_ids_in_species_CLI_version.py`: runs the pipeline for all of the proteins in an organism (in the orthoDB) at different phylogenetic levels. The levels are "Eukaryota", "Mammalia", "Metazoa", "Tetrapoda", and "Vertebrata". But you can easily change this in the script if you wanted.
+- `create_filemap.py`: not really used currently. creates a json file that maps the odb_gene_ids to the generated files. This is useful if you are running the pipeline on a lot of genes and you want to keep track of the files. <br>
+
+For any of the above, you can run `python <script_name>.py --help` to see the help message. <br>
+For easy access to the scripts, you can add the `./src/local_scripts/` directory to your PATH. <br>
+example of how to add this directory to your path via your bashrc file:
+```bash
+echo 'export PATH=$PATH:/path/to/this/repo/src/local_scripts/' >> ~/.bashrc
+```
+restart your terminal or run `source ~/.bashrc` to make the changes take effect. <br>
+
 
 ## pipeline parameters
 

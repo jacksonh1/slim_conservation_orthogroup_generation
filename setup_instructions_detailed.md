@@ -20,7 +20,7 @@ git clone https://github.com/jacksonh1/orthogroup_generation.git
 - Unzip the files (todo: see if you can work with the compressed files instead)
 - create a file called `.env` in this directory (where this README file is located)
   - or open the `.env` file here if it already exists 
-- Edit the `.env` file with the following:
+- Edit the `./src/local_env_variables/.env` file with the following:
   - add a `ORTHODB_DATA_DIR` variable with the absolute path to the directory containing the downloaded files
   - example `.env` file: 
 ```
