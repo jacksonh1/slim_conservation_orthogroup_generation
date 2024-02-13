@@ -107,8 +107,12 @@ def odb_gene_id_2_uniprotid(
     res = cursor.execute(
         f"SELECT Uniprotid FROM gene_refs WHERE odb_gene_id='{odb_gene_id}'"
     )
-    uniprot_id = res.fetchall()[0][0]
+    result = res.fetchall()
     connection.close()
+    if len(result) == 0:
+        # raise ValueError(f"no uniprot id found for gene id {odb_gene_id}")
+        return ""
+    uniprot_id =result[0][0]
     return uniprot_id
 
 

@@ -68,4 +68,3 @@ information will be stripped before mapping, e.g. "P12345-1" -> "P12345".''',
     args = parser.parse_args()
     main(args.input, args.uni_column, args.output)
 
-

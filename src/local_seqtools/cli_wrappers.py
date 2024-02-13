@@ -58,7 +58,7 @@ def cd_hit_wrapper(
         raise FileExistsError(f"{clustered_seqs_filename} already exists")
 
     clustered_seqs_clusters_filename = clustered_seqs_filename + ".clstr"
-    command = f"{cd_hit_executable} -i {temp_file.name} -o {clustered_seqs_filename} -M 0 -d 0 {extra_args}"
+    command = f"{cd_hit_executable} -i {temp_file.name} -o {clustered_seqs_filename} -M 0 -d 0 -g 1 {extra_args}"
     subprocess.run(command, shell=True, check=True)
 
     output_clstrs_dict = cdhit_tools.cd_hit_clstr_parser(
