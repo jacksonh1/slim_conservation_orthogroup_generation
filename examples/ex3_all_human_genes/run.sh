@@ -1,0 +1,2 @@
+python "../../src/local_scripts/pipeline_all_genes_in_species.py" -c "./params.yml" --species_id "9606_0" -o
+python "../../src/local_scripts/create_filemap.py" --main_output_folder "./output/" --output_file "./output/database_key.json"

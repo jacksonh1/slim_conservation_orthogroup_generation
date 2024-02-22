@@ -1412,7 +1412,7 @@
         "8932_0:003b96"
     ],
     "sequences_clustered_ldos": [
-        "9606_0:00194d",
+        "36723_0:00125d",
         "9796_0:004018",
         "9531_0:003200",
         "9417_0:00209d",
@@ -1421,7 +1421,7 @@
         "291302_0:0031fc",
         "30608_0:0015aa",
         "81572_0:0048a0",
-        "9483_0:0011de",
+        "9606_0:00194d",
         "10020_0:00458d",
         "885580_0:00290a",
         "34839_0:001f21",
@@ -1532,9 +1532,9 @@
         "303518_0:004ae4",
         "216574_0:003c68"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpsrmxhfvd -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpsrmxhfvd-cdhit.fa -M 0 -d 0 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp6t3cd23q -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp6t3cd23q-cdhit.fa -M 0 -d 0 -g 1 ",
     "species_map": {
-        "9606_0:00194d": "Homo sapiens",
+        "36723_0:00125d": "Mustela erminea",
         "9796_0:004018": "Equus caballus",
         "9531_0:003200": "Cercocebus atys",
         "9417_0:00209d": "Artibeus jamaicensis",
@@ -1543,7 +1543,7 @@
         "291302_0:0031fc": "Miniopterus natalensis",
         "30608_0:0015aa": "Microcebus murinus",
         "81572_0:0048a0": "Hylobates moloch",
-        "9483_0:0011de": "Callithrix jacchus",
+        "9606_0:00194d": "Homo sapiens",
         "10020_0:00458d": "Dipodomys ordii",
         "885580_0:00290a": "Fukomys damarensis",
         "34839_0:001f21": "Chinchilla lanigera",
@@ -1681,5 +1681,5 @@
         "write_files": true
     },
     "alignment_clustered_ldos_file": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/ex3_all_human_genes/output/alignments/9606_0_00194d_Vertebrata_1567973at7742_clustered_ldos_aln.fasta",
-    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmped04_36p\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmped04_36p-mafft.fa\""
+    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpksaj6guc\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpksaj6guc-mafft.fa\""
 }

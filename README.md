@@ -11,7 +11,7 @@ Written by Jackson Halpin <br>
   - [overview](#overview)
     - [using the tools as a command line script](#using-the-tools-as-a-command-line-script)
     - [using the tools as a module](#using-the-tools-as-a-module)
-    - [useful scripts: `./src/local_scripts/`](#useful-scripts-srclocal_scripts)
+  - [useful scripts: `./src/local_scripts/`](#useful-scripts-srclocal_scripts)
   - [pipeline parameters](#pipeline-parameters)
     - [pipeline parameters explained](#pipeline-parameters-explained)
 - [comments](#comments)
@@ -81,20 +81,16 @@ If you have issues or need more information, check out the [detailed setup instr
 
 # Usage
 
-**Look at the `./examples/` directory** where there are multiple different applications of the pipeline shown.
-
 There are different ways to use this pipeline depending on your use case:
 - You may want to run the pipeline on a small number of genes from a table
 - Or you may want to run the pipeline on all of the proteins in an organism's proteome at different phylogenetic levels and use the output as a database for downstream conservation analysis. <br>
-- examples of both of these use cases are shown in the `./examples/` directory
 
-The main pipeline is executed via the script: `./src/local_scripts/odb_group_pipeline.py`
-- It can be run as a command line script or imported to be used in another script (like if you are running it on a lot of genes). 
-
-Because the src code is installed as a package, you can import the tools from anywhere. Meaning you can run the main pipeline from anywhere on your computer as long as you have activated the environment (i.e. you're not stuck in this directory). <br>
+examples of both of these use cases are shown in the `./examples/` directory. There are also command line scripts to run the pipeline for these use cases in `./src/local_scripts/`. (see [useful scripts](#useful-scripts-srclocal_scripts)) <br>
 
 ## overview
-The main pipeline is executed via the file `./src/local_scripts/odb_group_pipeline.py`, which runs the pipeline for a single gene. This should be the only file that you need to access run the pipeline<br>
+The main pipeline is executed via the script: `./src/local_scripts/odb_group_pipeline.py`. It can be run as a command line script or imported to be used in another script (like if you are running it on a lot of genes).
+
+The script `./src/local_scripts/odb_group_pipeline.py` runs the pipeline for a single gene.<br>
   - The gene can be specified using a uniprot ID or an odb_gene_id (see *brief explanation of the orthodb data* in [advanced.md](./advanced.md) for more info on the ids used in orthoDB).
   - it outputs files with the results in json format and alignments in fasta format (if alignment is specified in the parameters). <br>
 The output will look like this:
@@ -113,13 +109,10 @@ main_output_folder/
 The json files contain information about the ortholog groups<br><br>
 See the [examples](./examples/) folder for example output. <br>
 
-The script `./src/local_scripts/create_filemap.py` is intended to be run after the main pipeline. It just creates a json file that maps the odb_gene_ids to the generated files.
-
-See `./examples/ex3_all_human_genes/` to see this.
 
 ### using the tools as a command line script
 
-The easiest way to explain how it works and how to use it is via the command line script help message:
+The easiest way to explain how to use the script is via the command line script help message:
 ```bash
 $ python ./src/local_scripts/odb_group_pipeline.py --help
 ```
@@ -162,7 +155,7 @@ In general you import the script as a module:
 ```python
 import local_scripts.odb_group_pipeline as pipeline
 ```
-This import should work from anywhere because you installed the src code as a package <br>
+This import should work from anywhere in your filesystem because you installed the src code as a package, as long as the environment is activated (`conda activate odb_groups_x86`). <br><br>
 The main function is `pipeline.main_pipeline` but it requires a configuration file to be loaded first (if using any non-default options). <br>
 This is done with the `pipeline.load_config` function:
 ```python
@@ -178,13 +171,15 @@ pipeline.main_pipeline(config, uniprot_id="Q8TC90")
 ```
 In this way, you can run the pipeline for any number of genes in a script as is shown is example 2 and example 3 <br>
 
-### useful scripts: `./src/local_scripts/`
+## useful scripts: `./src/local_scripts/`
+There are a few scripts in the `./src/local_scripts/` directory that are useful for running the pipeline in different scenarios or provide some other common use. They are explained below: <br>
 
+- `odb_group_pipeline.py`: the main pipeline. (described above) <br>
+- `pipeline_all_genes_in_species.py`: runs the pipeline for all of the proteins in an organism (in the orthoDB) at different phylogenetic levels. The levels are "Eukaryota", "Mammalia", "Metazoa", "Tetrapoda", and "Vertebrata". But you can easily change this in the script if you wanted. The levels are currently hard coded but that could easily be changed. <br>
+- `pipeline_input_table.py`: Runs the pipeline for all of the proteins in a table that has a column of uniprot ids or odb gene ids. The pipeline is run for each unique gene. This is useful if you want to create a starting point for conservation analysis for just a specific set of genes (can be from different organisms as well).<br>
+- `create_filemap.py`: Intended to be run after the pipeline. It creates a json file that maps the odb_gene_ids to the generated files. This is useful if you are running the pipeline on a lot of genes and you want to keep track of the files. This also creates a "database key" for use in the [motif conservation pipeline](https://github.com/jacksonh1/motif_conservation_in_IDRs)<br>
 - `map_uniprotid.py`: maps uniprot ids to orthoDB gene ids in an input table. <br>
     - outputs a new table with the orthoDB gene ids added as a new column
-- `odb_group_pipeline.py`: the main pipeline. (described above) <br>
-- `pipeline_all_ids_in_species_CLI_version.py`: runs the pipeline for all of the proteins in an organism (in the orthoDB) at different phylogenetic levels. The levels are "Eukaryota", "Mammalia", "Metazoa", "Tetrapoda", and "Vertebrata". But you can easily change this in the script if you wanted.
-- `create_filemap.py`: not really used currently. creates a json file that maps the odb_gene_ids to the generated files. This is useful if you are running the pipeline on a lot of genes and you want to keep track of the files. <br>
 
 For any of the above, you can run `python <script_name>.py --help` to see the help message. <br>
 For easy access to the scripts, you can add the `./src/local_scripts/` directory to your PATH. <br>
@@ -193,7 +188,6 @@ example of how to add this directory to your path via your bashrc file:
 echo 'export PATH=$PATH:/path/to/this/repo/src/local_scripts/' >> ~/.bashrc
 ```
 restart your terminal or run `source ~/.bashrc` to make the changes take effect. <br>
-
 
 ## pipeline parameters
 
