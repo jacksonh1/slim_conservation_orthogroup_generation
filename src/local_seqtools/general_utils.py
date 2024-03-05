@@ -83,3 +83,30 @@ def split_uniprot(prot_id):
     accession= prot[0]
     name=prot[1]
     return name, accession
+
+
+def get_regex_matches(regex_pattern: str, seq_str: str):
+    """searches for all matches of a regex pattern in a sequence string
+    returns a generator object that yields the match sequence, start index, and end index
+
+    Parameters
+    ----------
+    regex_pattern : str
+        regular expression pattern
+    seq_str : str
+        string to search for matches
+
+    Yields
+    ------
+    tuple
+        (match sequence, start index, end index)
+    """    
+    p = re.compile(regex_pattern)
+    for m in p.finditer(seq_str):
+        if m.start() == m.end():
+            # even if there are groups in the lookahead, the first group should be the full match b/c that group surrounds the entire regex
+            # so this will work whether or not there are groups in the lookahead
+            match_seq = m.groups()[0]
+        else:
+            match_seq = seq_str[m.start() : m.end()]
+        yield match_seq, m.start(), m.start() + len(match_seq)-1
