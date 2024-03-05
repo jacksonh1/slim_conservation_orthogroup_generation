@@ -1,7 +1,11 @@
-from Bio import SeqIO
+import re
+from pathlib import Path
+
+from Bio import Align, AlignIO, Seq, SeqIO
+from Bio.SeqRecord import SeqRecord
 
 
-def import_fasta(fasta_path, output_format='list') -> list[SeqIO.SeqRecord]|dict[str, SeqIO.SeqRecord]:
+def import_fasta(fasta_path, output_format='list') -> list[SeqRecord]|dict[str, SeqRecord]:
     """import fasta file into a list or dictionary of SeqRecord objects
 
     Parameters
@@ -26,3 +30,56 @@ def import_fasta(fasta_path, output_format='list') -> list[SeqIO.SeqRecord]|dict
             raise ValueError(f"Invalid output format - {output_format}. Expected one of: {allowed_formats}")
     return seqs
 
+
+
+class FastaImporter:
+    """import fasta file and return seqrecord objects in various formats
+
+    Parameters
+    ----------
+    fasta_path : str
+        file path to fasta file
+    """
+    def __init__(self, fasta_path: str|Path):
+        self.fasta_path = fasta_path
+
+    def import_as_list(self) -> list[SeqRecord]:
+        """return list of SeqRecord objects for each sequence in the fasta file
+
+        Returns
+        -------
+        List[SeqRecord]
+            list of SeqRecord objects
+        """        
+        with open(self.fasta_path) as handle:
+            return list(SeqIO.parse(handle, 'fasta'))
+
+    def import_as_dict(self) -> dict[str, SeqRecord]:
+        """return dictionary of SeqRecord objects for each sequence in the fasta file
+
+        Returns
+        -------
+        dict[str, SeqRecord]
+            dictionary of SeqRecord objects, keys are the sequence ids and values are the SeqRecord objects
+        """        
+        with open(self.fasta_path) as handle:
+            return SeqIO.to_dict(SeqIO.parse(handle, 'fasta'))
+        
+    def import_as_alignment(self) -> Align.MultipleSeqAlignment:
+        """return multiple sequence alignment object
+
+        Returns
+        -------
+        Align.MultipleSeqAlignment
+            multiple sequence alignment object
+        """        
+        with open(self.fasta_path) as handle:
+            return AlignIO.read(handle, 'fasta')
+
+
+def split_uniprot(prot_id):
+    j = re.compile(r"^[st][pr]\|(.+)\|(.+)")
+    prot = j.findall(prot_id)[0]
+    accession= prot[0]
+    name=prot[1]
+    return name, accession
