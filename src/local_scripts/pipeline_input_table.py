@@ -135,12 +135,22 @@ if __name__ == "__main__":
         action="store_true",
         help="""if flag is provided and the main_output_folder exists, it will be removed and overwritten by the new files. Otherwise, an error will be raised if the folder exists""",
     )
+    parser.add_argument(
+        "-l",
+        "--og_levels",
+        nargs="*",
+        metavar="<list>",
+        default=OG_LEVELS,
+        help=f"""list of orthologous group levels to run the pipeline for""",
+    )
     args = parser.parse_args()
+    # for arg in vars(args):
+    #     print(f"{arg}: {getattr(args, arg)}")
     config = pipeline.load_config(args.config)
     main(
         config,
         table_file=args.table,
-        og_levels=OG_LEVELS,
+        og_levels=args.og_levels,
         odb_gene_id_column=args.odb_gene_id_column,
         uniprot_id_column=args.uniprot_id_column,
         n_cores=args.n_cores,
