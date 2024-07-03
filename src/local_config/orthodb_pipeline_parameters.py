@@ -108,6 +108,7 @@ class PipelineParams:
     _cd_hit_additional_args: str = field(default=env.CD_HIT_ADDITIONAL_ARGUMENTS)
     main_output_folder: str = field(default="./processed_odb_groups_output")
     write_files: bool = field(default=True)
+    overwrite: bool = field(default=False)
 
     @classmethod
     def from_dict(cls, d):

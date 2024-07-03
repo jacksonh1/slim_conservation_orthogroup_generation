@@ -1,13 +1,13 @@
 import copy
 
 import pandas as pd
-from Bio import Seq, SeqIO
+from Bio.SeqRecord import SeqRecord
 
 
 def filter_seqs_with_nonaa_chars(
-    seqrecord_dict: dict[str, SeqIO.SeqRecord],
-    prohibited_chars: list[str] = ["X", "x", "*"],
-) -> dict[str, SeqIO.SeqRecord]:
+    seqrecord_dict: dict[str, SeqRecord],
+    prohibited_chars: list[str] = ["X", "x", "*", "J", "B", "Z", "U"],
+) -> dict[str, SeqRecord]:
     """
     filter sequences with non amino acid characters such as X and *.
 
@@ -26,9 +26,9 @@ def filter_seqs_with_nonaa_chars(
 
 
 def filter_shorter_sequences(
-    seqrecord_dict: dict[str, SeqIO.SeqRecord],
+    seqrecord_dict: dict[str, SeqRecord],
     min_length: int|float,
-) -> dict[str, SeqIO.SeqRecord]:
+) -> dict[str, SeqRecord]:
     filtered_og_seq_dict = {}
     for seq_id, seq in seqrecord_dict.items():
         if len(seq) < min_length:
