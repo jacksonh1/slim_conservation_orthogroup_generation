@@ -4,21 +4,23 @@ from pathlib import Path
 
 import dotenv
 import pandas as pd
+
 # from attrs import define, field
 from attrs import frozen
 from Bio import SeqIO
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 dotenv.load_dotenv(dotenv_path)
-orthodb_dir = Path(os.environ['ORTHODB_DATA_DIR'])
-MAFFT_EXECUTABLE = os.environ['MAFFT_EXECUTABLE']
-MAFFT_ADDITIONAL_ARGUMENTS = os.environ['MAFFT_ADDITIONAL_ARGUMENTS']
-CD_HIT_EXECUTABLE = os.environ['CD_HIT_EXECUTABLE']
-CD_HIT_ADDITIONAL_ARGUMENTS = os.environ['CD_HIT_ADDITIONAL_ARGUMENTS']
+orthodb_dir = Path(os.environ["ORTHODB_DATA_DIR"])
+MAFFT_EXECUTABLE = os.environ["MAFFT_EXECUTABLE"]
+MAFFT_ADDITIONAL_ARGUMENTS = os.environ["MAFFT_ADDITIONAL_ARGUMENTS"]
+CD_HIT_EXECUTABLE = os.environ["CD_HIT_EXECUTABLE"]
+CD_HIT_ADDITIONAL_ARGUMENTS = os.environ["CD_HIT_ADDITIONAL_ARGUMENTS"]
 
 # ==============================================================================
 # // getting odb filepaths
 # ==============================================================================
+
 
 @frozen
 class orthoDB_files_object:
@@ -36,7 +38,9 @@ class orthoDB_files_object:
     levels2species_tsv: str = str(orthodb_dir / "odb11v0_level2species.tab")
     species_tsv: str = str(orthodb_dir / "odb11v0_species.tab")
 
+
 orthoDB_files = orthoDB_files_object()
+
 
 # ==============================================================================
 # // data loading functions
@@ -67,6 +71,7 @@ def load_data_species_df(database_files: orthoDB_files_object = orthoDB_files):
     )
     return species_df
 
+
 def load_data_levels_df(database_files: orthoDB_files_object = orthoDB_files):
     levels_df = pd.read_csv(
         database_files.levels_tsv,
@@ -84,9 +89,9 @@ def load_data_levels_df(database_files: orthoDB_files_object = orthoDB_files):
 
 
 class orthoDB_database:
-    '''
+    """
     main class that holds the orthoDB data
-    '''    
+    """
 
     def __init__(self, database_files: orthoDB_files_object = orthoDB_files):
         self.datafiles = database_files
@@ -111,7 +116,7 @@ class orthoDB_database:
             .to_dict()["level name"]
         )
 
-    def get_sequences_from_list_of_seq_ids(self, sequence_ids: list[str]) -> dict[str, SeqIO.SeqRecord]:
+    def get_sequences_from_list_of_seq_ids(self, sequence_ids: list[str]) -> dict:
         og_seq_dict = {}
         for odb_gene_id in sequence_ids:
             og_seq_dict[odb_gene_id] = self.data_all_seqrecords_dict[odb_gene_id]
@@ -142,7 +147,7 @@ class orthoDB_database:
 #     if len(list(orthodb_dir.glob(v))) > 1:
 #         raise FileNotFoundError(f"Found multiple files for `{k}`. \nSearched with wildcard {orthodb_dir}/{v}")
 
-# # The sqlite files are created by the scripts in scripts-gen_SQLite_dbs and I 
+# # The sqlite files are created by the scripts in scripts-gen_SQLite_dbs and I
 # # want to import and use this library to retrieve those file names before they are created
 # # so I am not checking for their existence here.
 # odb_data_files["all_seqs_sqlite"] = odb_data_files["all_seqs_fasta"].with_suffix(".sqlite")

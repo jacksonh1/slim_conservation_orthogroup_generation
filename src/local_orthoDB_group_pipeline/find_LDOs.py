@@ -20,18 +20,6 @@ def setup_df(seqrecord_dict_in: dict[str, SeqIO.SeqRecord]) -> pd.DataFrame:
     return df
 
 
-def _alfpy_query_matrix(
-    query_seqrecord: SeqIO.SeqRecord, matrix: distmatrix.Matrix
-) -> tuple[list[str], list[float]]:
-    """
-    get the row from the alfpy matrix that corresponds to the query gene
-    """
-    query_row = [c for c, i in enumerate(matrix.id_list) if query_seqrecord.id in i][0]
-    query_row_distance = matrix.data[query_row]
-    query_row_similarity = 1 - query_row_distance
-    return matrix.id_list, query_row_similarity
-
-
 def addpid_by_msa(
     df_in: pd.DataFrame,
     query_seqrecord: SeqIO.SeqRecord,
@@ -106,7 +94,7 @@ def addpid_by_alfpy_google_distance(
         if query_seqrecord.id not in [seq.id for seq in seqs]:
             seqs.append(query_seqrecord)
         matrix = aln_tools.alfpy_distance_matrix(seqs, word_size=2)
-        id_list, query_row_similarity = _alfpy_query_matrix(query_seqrecord, matrix)
+        id_list, query_row_similarity = aln_tools.query_alfpy_distance_matrix(query_seqrecord.id, matrix, similarity=True)
         for seq_id, similarity in zip(id_list, query_row_similarity):
             pid_map_dict[seq_id] = similarity
         # if counter % 100 == 0:

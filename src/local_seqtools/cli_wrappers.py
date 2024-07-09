@@ -10,15 +10,16 @@ from Bio import Align, AlignIO, Seq, SeqIO
 import local_env_variables.env_variables as env
 import local_seqtools.cdhit_tools as cdhit_tools
 import local_seqtools.general_utils as tools
+from Bio.SeqRecord import SeqRecord
 
 
 def mafft_align_wrapper(
-    input_seqrecord_list: list[SeqIO.SeqRecord],
+    input_seqrecord_list: list[SeqRecord],
     mafft_executable: str = env.MAFFT_EXECUTABLE,
     extra_args: str = env.MAFFT_ADDITIONAL_ARGUMENTS,
     n_align_threads: int = 8,
     output_format: str = "dict",
-) -> tuple[str, dict[str, SeqIO.SeqRecord]]:
+) -> tuple[str, dict|list]:
     # example extra_args: "--retree 1"
     # create temporary file
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
@@ -42,10 +43,10 @@ def mafft_align_wrapper(
 
 
 def cd_hit_wrapper(
-    input_seqrecord_list: list[SeqIO.SeqRecord],
+    input_seqrecord_list: list[SeqRecord],
     cd_hit_executable: str = env.CD_HIT_EXECUTABLE,
     extra_args: str = env.CD_HIT_ADDITIONAL_ARGUMENTS,
-) -> tuple[str, dict[str, SeqIO.SeqRecord], dict[str, dict[str, list[str]]]]:
+) -> tuple[str, dict[str, SeqRecord], dict[str, dict[str, list[str]]]]:
 
     # create temporary file
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
@@ -75,7 +76,10 @@ def cd_hit_wrapper(
 
 
 def clustal_align_wrapper(
-    input_seqrecord_list, alignment_type="basic", output_type="list"
+    input_seqrecord_list,
+    alignment_type="basic", 
+    output_type="list", 
+    n_align_threads: int = 8,
 ):
     assert output_type in [
         "list",
@@ -97,10 +101,10 @@ def clustal_align_wrapper(
         raise FileExistsError(f"{alignment_filename} already exists")
 
     if alignment_type == "basic":
-        clustal_command = f'clustalo -i "{temp_file.name}" -o "{alignment_filename}" -v --outfmt=fa --threads=6'
+        clustal_command = f'clustalo -i "{temp_file.name}" -o "{alignment_filename}" -v --outfmt=fa --threads={n_align_threads}'
     # elif alignment_type == "full":
     else:
-        clustal_command = f'clustalo -i "{temp_file.name}" -o "{alignment_filename}" -v --outfmt=fa --full --threads=6'
+        clustal_command = f'clustalo -i "{temp_file.name}" -o "{alignment_filename}" -v --outfmt=fa --full --threads={n_align_threads}'
     subprocess.run(clustal_command, shell=True, check=True)
 
     # read in clustal output
@@ -118,10 +122,11 @@ def clustal_align_wrapper(
 
         
 def muscle_align_wrapper(
-    input_seqrecord_list: list[SeqIO.SeqRecord],
+    input_seqrecord_list: list[SeqRecord],
     muscle_binary: str = "/Users/jackson/tools/muscle/muscle-5.1.0/src/Darwin/muscle",
-    output_type:str = "list"
-) -> list[SeqIO.SeqRecord] | dict[str, SeqIO.SeqRecord] | AlignIO.MultipleSeqAlignment:
+    output_type:str = "list",
+    n_align_threads: int = 8,
+) -> list[SeqRecord] | dict[str, SeqRecord] | Align.MultipleSeqAlignment:
     assert output_type in [
         "list",
         "dict",
@@ -137,7 +142,7 @@ def muscle_align_wrapper(
         raise FileExistsError(f"{alignment_filename} already exists")
 
     muscle_command = (
-        f'{muscle_binary} -super5 "{temp_file.name}" -output "{alignment_filename}"'
+        f'{muscle_binary} -super5 "{temp_file.name}" -output "{alignment_filename}" -threads {n_align_threads}'
     )
     subprocess.run(muscle_command, shell=True, check=True)
 

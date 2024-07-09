@@ -6,7 +6,7 @@ from Bio.SeqRecord import SeqRecord
 
 def filter_seqs_with_nonaa_chars(
     seqrecord_dict: dict[str, SeqRecord],
-    prohibited_chars: list[str] = ["X", "x", "*", "J", "B", "Z", "U"],
+    prohibited_chars: list[str] = ["X", "x", "*", "J", "B", "Z"],
 ) -> dict[str, SeqRecord]:
     """
     filter sequences with non amino acid characters such as X and *.
