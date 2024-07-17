@@ -36,10 +36,10 @@ Create a conda environment with the necessary packages using the environment fil
 if you have an ARM64 mac (M1/M2) you have to create an x86 environment to install all of the packages at this point in time <br>
 to do so run the following commands:<br>
 ```bash
-CONDA_SUBDIR=osx-64 conda create -n odb_groups_x86
-conda activate odb_groups_x86
+CONDA_SUBDIR=osx-64 conda create -n slim_conservation_orthogroup_generation
+conda activate slim_conservation_orthogroup_generation
 conda config --env --set subdir osx-64
-conda update -f=envirenment.yml --name=odb_groups_x86
+conda update -f=envirenment.yml --name=slim_conservation_orthogroup_generation
 ```
 if you have an older intel mac, you shouldn't have to use the above commands, you should be able to just run the following command: <br>
 `conda env create -f environment.yml` <br>
@@ -57,7 +57,7 @@ You can try creating the environment from the `./environment_compatible.yml` fil
 ## install local tools in environment
 
 **TL;DR**: 
-- activate the environment: `conda activate odb_groups_x86`
+- activate the environment: `conda activate slim_conservation_orthogroup_generation`
 - run `pip install .` in this directory (where `setup.py` file is located) <br>
 
 I wrote this pipeline (code in `./src/`) for it to be installed in the environment as a local package. <br>
@@ -66,7 +66,7 @@ combined with information from here: https://setuptools.pypa.io/en/latest/usergu
 
 Install the modules/tools as a local package using setuptools. <br>
 first activate the environment: <br>
-`conda activate odb_groups_x86` <br>
+`conda activate slim_conservation_orthogroup_generation` <br>
 
 Make sure that you are in this directory in terminal (where `setup.py` file is located) and run the following command to install: <br>
 `pip install .` <br>

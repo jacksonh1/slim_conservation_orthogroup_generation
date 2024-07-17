@@ -1,4 +1,4 @@
-name: odb_groups_x86
+name: slim_conservation_orthogroup_generation
 channels:
   - bioconda
   - conda-forge

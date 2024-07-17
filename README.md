@@ -68,13 +68,13 @@ This repository contains tools to retrieve and process ortholog groups from a lo
        - if you have an ARM64 mac (M1/M2) you have to create an x86 environment to install all of the packages at this point in time
        - to do so run the following commands:
           ```bash
-          CONDA_SUBDIR=osx-64 conda create -n odb_groups_x86
-          conda activate odb_groups_x86
+          CONDA_SUBDIR=osx-64 conda create -n slim_conservation_orthogroup_generation
+          conda activate slim_conservation_orthogroup_generation
           conda config --env --set subdir osx-64
-          conda update -f=envirenment.yml --name=odb_groups_x86
+          conda update -f=envirenment.yml --name=slim_conservation_orthogroup_generation
           ```
    - Linux/windows WSL - `conda env create -f environment_linux.yml` <br>
-6. activate the environment: `conda activate odb_groups_x86` <br>
+6. activate the environment: `conda activate slim_conservation_orthogroup_generation` <br>
 7. install the local package: `pip install -e .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
    - *Note: This creates separate databases for each file. You could easily make one database with all of the tables, however I tried this and it was significantly slower to query. I don't know why.* <br>
@@ -157,7 +157,7 @@ In general you import the script as a module:
 ```python
 import local_scripts.odb_group_pipeline as pipeline
 ```
-This import should work from anywhere in your filesystem because you installed the src code as a package, as long as the environment is activated (`conda activate odb_groups_x86`). <br><br>
+This import should work from anywhere in your filesystem because you installed the src code as a package, as long as the environment is activated (`conda activate slim_conservation_orthogroup_generation`). <br><br>
 The main function is `pipeline.main_pipeline` but it requires a configuration file to be loaded first (if using any non-default options). <br>
 This is done with the `pipeline.load_config` function:
 ```python
