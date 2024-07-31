@@ -11,7 +11,7 @@ pipeline_pt1.code-workspace
 plan.md
 *.sqlite
 temp.py
-src/archive/
+orthodb_tools/archive/
 archive/
 
 *.pyc

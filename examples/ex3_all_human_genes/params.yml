@@ -1,3 +1,5 @@
+overwrite: true
+
 filter_params:
   min_fraction_shorter_than_query: 0.5
 

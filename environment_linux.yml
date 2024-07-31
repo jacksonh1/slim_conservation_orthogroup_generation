@@ -1,4 +1,3 @@
-name: slim_conservation_orthogroup_generation
 channels:
   - bioconda
   - conda-forge

@@ -6,7 +6,7 @@ In the examples shown here, the scripts are executed via a bash script called `r
 
 ### `./uniprotid_mapping/`
 A simple script to map uniprot ids to odb_gene_ids. Takes a table with a column of uniprot ids and tries to map each uniprot id to a odb_gene_id. outputs a copy of the table with an added column of odb_gene_ids<br>
-run `python ../src/local_scripts/map_uniprotid.py --help` to see more.
+run `python ../orthodb_tools/scripts/map_uniprotid.py --help` to see more.
 
 ### `./ex1_single_gene/`:
 
@@ -18,14 +18,14 @@ In this example, a table with a column of uniprot ids is imported and ortholog g
 
 ### `./ex3_all_human_genes/`:
 In this example, there is a script that runs the pipeline for all of the human genes in the database. The aim is to construct a "database" of precomputed orthogroups.<br>
-- pipeline is imported and used in the script `../src/local_scripts/pipeline_all_genes_in_species.py`
+- pipeline is imported and used in the script `../orthodb_tools/scripts/pipeline_all_genes_in_species.py`
 - uses multiprocessing
-- A filemap is also created after the pipeline is run using the script `../src/local_scripts/create_filemap.py`
+- A filemap is also created after the pipeline is run using the script `../orthodb_tools/scripts/create_filemap.py`
 
 note: Running on the full dataset using 62 cores, this pipeline took a few hours to run and generated around 10 Gb of data. When I ran it with align=True, it generated around 100 Gbs of data and takes considerably longer (~1 day). <br>
 
 ### `./ex4_create_database_from_table/`:
-In this example, I use the script `../src/local_scripts/pipeline_input_table.py` to create a database of orthogroups from a table. This is similar to the previous example, but the genes are retrieved from a table instead of being run for all genes in a species. <br>
+In this example, I use the script `../orthodb_tools/scripts/pipeline_input_table.py` to create a database of orthogroups from a table. This is similar to the previous example, but the genes are retrieved from a table instead of being run for all genes in a species. <br>
 
 ### `./pipeline_walkthrough_for_single_gene/`:
 
@@ -38,6 +38,6 @@ This folder contains a notebook that walks through the pipeline step by step to 
         - orthogroup info files `info_jsons/`
         - alignments: `alignments/`
         - file map: `filemap.json`
-2. for a table of candidate motifs from human genes with a column of uniprot ids, map the uniprot ids to odb_gene_ids (using the script `../src/local_scripts/map_uniprotid.py`).
+2. for a table of candidate motifs from human genes with a column of uniprot ids, map the uniprot ids to odb_gene_ids (using the script `../orthodb_tools/scripts/map_uniprotid.py`).
 3. use the database filemap (e.g. `filemap.json`) to access the database files from the odb_gene_ids
 

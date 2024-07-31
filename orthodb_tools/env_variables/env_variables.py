@@ -23,7 +23,7 @@ CD_HIT_ADDITIONAL_ARGUMENTS = os.environ["CD_HIT_ADDITIONAL_ARGUMENTS"]
 
 
 @frozen
-class orthoDB_files_object:
+class OrthoDBFiles:
     all_seqs_fasta: str = str(orthodb_dir / "odb11v0_all_og_fasta.tab")
     all_seqs_sqlite: str = str(orthodb_dir / "odb11v0_all_og.sqlite")
     gene_refs_tsv: str = str(orthodb_dir / "odb11v0_genes.tab")
@@ -39,13 +39,13 @@ class orthoDB_files_object:
     species_tsv: str = str(orthodb_dir / "odb11v0_species.tab")
 
 
-orthoDB_files = orthoDB_files_object()
+orthoDB_files = OrthoDBFiles()
 
 
 # ==============================================================================
 # // data loading functions
 # ==============================================================================
-def load_data_all_odb_seqs(database_files: orthoDB_files_object = orthoDB_files):
+def load_data_all_odb_seqs(database_files: OrthoDBFiles = orthoDB_files):
     data_all_seqrecords_dict = SeqIO.index_db(
         str(database_files.all_seqs_sqlite),
         str(database_files.all_seqs_fasta),
@@ -54,7 +54,7 @@ def load_data_all_odb_seqs(database_files: orthoDB_files_object = orthoDB_files)
     return data_all_seqrecords_dict
 
 
-def load_data_species_df(database_files: orthoDB_files_object = orthoDB_files):
+def load_data_species_df(database_files: OrthoDBFiles = orthoDB_files):
     species_df = pd.read_csv(
         database_files.species_tsv,
         sep="\t",
@@ -72,7 +72,7 @@ def load_data_species_df(database_files: orthoDB_files_object = orthoDB_files):
     return species_df
 
 
-def load_data_levels_df(database_files: orthoDB_files_object = orthoDB_files):
+def load_data_levels_df(database_files: OrthoDBFiles = orthoDB_files):
     levels_df = pd.read_csv(
         database_files.levels_tsv,
         sep="\t",
@@ -88,12 +88,12 @@ def load_data_levels_df(database_files: orthoDB_files_object = orthoDB_files):
     return levels_df
 
 
-class orthoDB_database:
+class orthoDBDatabase:
     """
     main class that holds the orthoDB data
     """
 
-    def __init__(self, database_files: orthoDB_files_object = orthoDB_files):
+    def __init__(self, database_files: OrthoDBFiles = orthoDB_files):
         self.datafiles = database_files
         self.data_all_seqrecords_dict = load_data_all_odb_seqs(self.datafiles)
         self.data_levels_df = load_data_levels_df(self.datafiles)

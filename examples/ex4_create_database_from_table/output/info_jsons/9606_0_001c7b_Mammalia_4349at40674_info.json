@@ -570,7 +570,7 @@
         "9361_0:000d26",
         "9708_0:00440b"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpt4x38cuq -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpt4x38cuq-cdhit.fa -M 0 -d 0 -g 1 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp9ewg70c6 -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp9ewg70c6-cdhit.fa -M 0 -d 0 -g 1 ",
     "species_map": {
         "36723_0:00125d": "Mustela erminea",
         "9796_0:004018": "Equus caballus",
@@ -630,8 +630,9 @@
         "_cd_hit_exe": "cd-hit",
         "_cd_hit_additional_args": "",
         "main_output_folder": "output",
-        "write_files": true
+        "write_files": true,
+        "overwrite": false
     },
     "alignment_clustered_ldos_file": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/ex4_create_database_from_table/output/alignments/9606_0_001c7b_Mammalia_4349at40674_clustered_ldos_aln.fasta",
-    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpzl01or7f\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpzl01or7f-mafft.fa\""
+    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp535nd7jj\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp535nd7jj-mafft.fa\""
 }

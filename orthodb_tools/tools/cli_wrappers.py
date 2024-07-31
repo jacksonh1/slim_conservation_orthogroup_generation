@@ -7,9 +7,9 @@ from pathlib import Path
 
 from Bio import Align, AlignIO, Seq, SeqIO
 
-import local_env_variables.env_variables as env
-import local_seqtools.cdhit_tools as cdhit_tools
-import local_seqtools.general_utils as tools
+import orthodb_tools.env_variables.env_variables as env
+import orthodb_tools.tools.cdhit_tools as cdhit_tools
+import orthodb_tools.tools.general_utils as tools
 from Bio.SeqRecord import SeqRecord
 
 
@@ -19,7 +19,7 @@ def mafft_align_wrapper(
     extra_args: str = env.MAFFT_ADDITIONAL_ARGUMENTS,
     n_align_threads: int = 8,
     output_format: str = "dict",
-) -> tuple[str, dict|list]:
+) -> tuple[str, dict | list]:
     # example extra_args: "--retree 1"
     # create temporary file
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
@@ -39,7 +39,7 @@ def mafft_align_wrapper(
     # delete temporary file
     os.remove(alignment_filename)
     os.remove(temp_file.name)
-    return mafft_command, mafft_output # type: ignore
+    return mafft_command, mafft_output  # type: ignore
 
 
 def cd_hit_wrapper(
@@ -71,14 +71,13 @@ def cd_hit_wrapper(
     os.remove(clustered_seqs_filename)
     os.remove(clustered_seqs_clusters_filename)
     os.remove(temp_file.name)
-    return command, output, output_clstrs_dict # type: ignore
-
+    return command, output, output_clstrs_dict  # type: ignore
 
 
 def clustal_align_wrapper(
     input_seqrecord_list,
-    alignment_type="basic", 
-    output_type="list", 
+    alignment_type="basic",
+    output_type="list",
     n_align_threads: int = 8,
 ):
     assert output_type in [
@@ -120,11 +119,11 @@ def clustal_align_wrapper(
     os.remove(temp_file.name)
     return clustal_output
 
-        
+
 def muscle_align_wrapper(
     input_seqrecord_list: list[SeqRecord],
     muscle_binary: str = "/Users/jackson/tools/muscle/muscle-5.1.0/src/Darwin/muscle",
-    output_type:str = "list",
+    output_type: str = "list",
     n_align_threads: int = 8,
 ) -> list[SeqRecord] | dict[str, SeqRecord] | Align.MultipleSeqAlignment:
     assert output_type in [
@@ -141,9 +140,7 @@ def muscle_align_wrapper(
     if os.path.exists(alignment_filename):
         raise FileExistsError(f"{alignment_filename} already exists")
 
-    muscle_command = (
-        f'{muscle_binary} -super5 "{temp_file.name}" -output "{alignment_filename}" -threads {n_align_threads}'
-    )
+    muscle_command = f'{muscle_binary} -super5 "{temp_file.name}" -output "{alignment_filename}" -threads {n_align_threads}'
     subprocess.run(muscle_command, shell=True, check=True)
 
     if output_type == "list":

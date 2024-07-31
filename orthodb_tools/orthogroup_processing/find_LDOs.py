@@ -5,9 +5,9 @@ import pandas as pd
 from alfpy.utils import distmatrix
 from Bio import SeqIO
 
-import local_orthoDB_group_pipeline.sql_queries as sql_queries
-import local_seqtools.alignment_tools as aln_tools
-import local_seqtools.cli_wrappers as cli
+import orthodb_tools.sql_queries as sql_queries
+import orthodb_tools.tools.alignment_tools as aln_tools
+import orthodb_tools.tools.cli_wrappers as cli
 
 
 def setup_df(seqrecord_dict_in: dict[str, SeqIO.SeqRecord]) -> pd.DataFrame:
@@ -32,9 +32,9 @@ def addpid_by_msa(
     _, msa_seqrecord_dict = cli.mafft_align_wrapper(
         seqrecord_list, n_align_threads=n_align_threads, **mafft_kwargs
     )
-    query_msa_seqrecord = msa_seqrecord_dict[query_seqrecord.id] # type: ignore
+    query_msa_seqrecord = msa_seqrecord_dict[query_seqrecord.id]  # type: ignore
     # query_msa_seqrecord = [i for i in msa_seqrecord_dict if i.id == query_seqrecord.id][ # type: ignore
-        # 0
+    # 0
     # ]
     # could do this by applying a function to the `id` column but this seems a bit simpler
     pid_map_dict = {
@@ -94,7 +94,9 @@ def addpid_by_alfpy_google_distance(
         if query_seqrecord.id not in [seq.id for seq in seqs]:
             seqs.append(query_seqrecord)
         matrix = aln_tools.alfpy_distance_matrix(seqs, word_size=2)
-        id_list, query_row_similarity = aln_tools.query_alfpy_distance_matrix(query_seqrecord.id, matrix, similarity=True)
+        id_list, query_row_similarity = aln_tools.query_alfpy_distance_matrix(
+            query_seqrecord.id, matrix, similarity=True
+        )
         for seq_id, similarity in zip(id_list, query_row_similarity):
             pid_map_dict[seq_id] = similarity
         # if counter % 100 == 0:

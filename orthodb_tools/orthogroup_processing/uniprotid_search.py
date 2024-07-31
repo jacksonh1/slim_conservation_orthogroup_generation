@@ -1,11 +1,11 @@
-import local_env_variables.env_variables as env
-import local_orthoDB_group_pipeline.sql_queries as sql_queries
+import orthodb_tools.env_variables.env_variables as env
+import orthodb_tools.sql_queries as sql_queries
 
 
 def uniprotid_2_odb_gene_id(
-        uniprotid: str,
-        duplicate_action: str = "longest",
-    ) -> str:
+    uniprotid: str,
+    duplicate_action: str = "longest",
+) -> str:
     """Given a uniprot id, return the gene id (orthodb id). If multiple gene ids are found, return the `duplicate_action` one (first or longest)
 
     Parameters
@@ -28,7 +28,7 @@ def uniprotid_2_odb_gene_id(
         if duplicate_action is not "first" or "longest"
     ValueError
         if the uniprot id is not found in the database
-    """    
+    """
     if duplicate_action not in ["first", "longest"]:
         raise ValueError(
             f"duplicate_action must be 'first' or 'longest', not {duplicate_action}"
@@ -56,17 +56,16 @@ def uniprotid_2_odb_gene_id(
             seq_list = []
             for odb_gene_id in odb_gene_ids:
                 if odb_gene_id not in data_all_seqrecords_dict:
-                    print(f"{odb_gene_id} not found in fasta file. Probably doesn't have an orthogroup. Skipping.")
+                    print(
+                        f"{odb_gene_id} not found in fasta file. Probably doesn't have an orthogroup. Skipping."
+                    )
                     continue
                 seq = data_all_seqrecords_dict[odb_gene_id]
                 seq_list.append(seq)
-            sorted_seq_list = sorted(
-                seq_list, key=lambda x: len(x.seq), reverse=True
-            )
+            sorted_seq_list = sorted(seq_list, key=lambda x: len(x.seq), reverse=True)
             query_odb_gene_id = sorted_seq_list[0].id
             print(f"choosing {query_odb_gene_id} as the longest sequence")
             return query_odb_gene_id
     else:
         query_odb_gene_id = odb_gene_ids[0]
         return query_odb_gene_id
-

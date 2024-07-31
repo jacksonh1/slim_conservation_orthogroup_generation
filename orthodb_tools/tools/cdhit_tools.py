@@ -1,27 +1,31 @@
 from pathlib import Path
 
-import local_seqtools.cli_wrappers as cli
+import orthodb_tools.tools.cli_wrappers as cli
 
 
-def cd_hit_clstr_parser(clstr_filepath: str|Path) -> dict[str, dict[str, list[str]]]:
-    '''
+def cd_hit_clstr_parser(clstr_filepath: str | Path) -> dict[str, dict[str, list[str]]]:
+    """
     returns dictionary of cluster names and their members
     the dictionary will have two keys for each cluster:
     'all_members' (containing the seq ids for every sequence in the cluster including the representative sequence) and 'representative_seq' (just the id of the representative sequence)
     TODO: might want to not split the sequence id from the ... at the end (removes %ids from cd-hit)
     `clstr_filepath` is the path to the cd-hit output file
-    '''
+    """
     clusters_dict = {}
-    with open(clstr_filepath, 'r') as f:
+    with open(clstr_filepath, "r") as f:
         for line in f:
-            if line.startswith('>'):
-                cluster = line.split('>')[1].strip()
+            if line.startswith(">"):
+                cluster = line.split(">")[1].strip()
                 clusters_dict[cluster] = {}
                 continue
             else:
-                clusters_dict[cluster].setdefault('all_members', []).append(line.split('>')[1].strip().split('...')[0])
-                if line.strip().endswith('*'):
-                    clusters_dict[cluster]['representative_seq'] = line.split('>')[1].strip().split('...')[0]
+                clusters_dict[cluster].setdefault("all_members", []).append(
+                    line.split(">")[1].strip().split("...")[0]
+                )
+                if line.strip().endswith("*"):
+                    clusters_dict[cluster]["representative_seq"] = (
+                        line.split(">")[1].strip().split("...")[0]
+                    )
     return clusters_dict
 
 
@@ -33,15 +37,17 @@ def cd_hit_clstr_redefine_cluster_representative_by_keywords(clusters_dict, keyw
     :return: dict of clusters
     """
     for cluster in clusters_dict:
-        n_found=0
+        n_found = 0
         found_list = []
-        for i in clusters_dict[cluster]['all_members']:
+        for i in clusters_dict[cluster]["all_members"]:
             if any([keyword in i for keyword in keywords]):
-                print(f'found keyword in {cluster}')
-                clusters_dict[cluster]['representative_seq'] = i
+                print(f"found keyword in {cluster}")
+                clusters_dict[cluster]["representative_seq"] = i
                 n_found += 1
                 found_list.append(i)
-        assert n_found <=1, f"found more than one id with {keywords} in {cluster}\n{clusters_dict[cluster]['all_members']}"
+        assert (
+            n_found <= 1
+        ), f"found more than one id with {keywords} in {cluster}\n{clusters_dict[cluster]['all_members']}"
     return clusters_dict
 
 
@@ -67,7 +73,9 @@ def cdhit_minidriver(seqrecords_2_cluster_list, repr_id_keywords):
         seqrecord.id: seqrecord for seqrecord in seqrecords_2_cluster_list
     }
     _, _, cdhit_clstr_dict = cli.cd_hit_wrapper(seqrecords_2_cluster_list)
-    cdhit_clstr_dict = cd_hit_clstr_redefine_cluster_representative_by_keywords(cdhit_clstr_dict, keywords=repr_id_keywords)
+    cdhit_clstr_dict = cd_hit_clstr_redefine_cluster_representative_by_keywords(
+        cdhit_clstr_dict, keywords=repr_id_keywords
+    )
     sequences_clustered_OG_dict = cdhit_clstr_retrieve_representative_sequences(
         cdhit_clstr_dict, seqrecords_2_cluster_dict
     )

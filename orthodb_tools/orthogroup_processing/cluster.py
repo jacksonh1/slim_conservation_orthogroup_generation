@@ -4,8 +4,8 @@ from typing import Union
 import pandas as pd
 from Bio import SeqIO
 
-import local_seqtools.cdhit_tools as cdhit_tools
-import local_seqtools.cli_wrappers as cli
+import orthodb_tools.tools.cdhit_tools as cdhit_tools
+import orthodb_tools.tools.cli_wrappers as cli
 
 
 def cdhit_clstr_retrieve_representative_sequences(

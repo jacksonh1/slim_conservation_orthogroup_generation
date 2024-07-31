@@ -13,7 +13,7 @@ This work was supported by the National Institutes of Health under Award Number 
   - [overview](#overview)
     - [using the tools as a command line script](#using-the-tools-as-a-command-line-script)
     - [using the tools as a module](#using-the-tools-as-a-module)
-  - [useful scripts: `./src/local_scripts/`](#useful-scripts-srclocal_scripts)
+  - [useful scripts: `./orthodb_tools/scripts/`](#useful-scripts-orthodb_toolsscripts)
   - [pipeline parameters](#pipeline-parameters)
     - [pipeline parameters explained](#pipeline-parameters-explained)
 - [comments](#comments)
@@ -59,10 +59,10 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 
 # setup TL;DR:
 
-1. download this repository
-2. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
-3. navigate to this downloaded repository in terminal (where this README file is located)
-4. edit the file `./src/local_env_variables/.env` with the location of the orthoDB downloads: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
+1. download the orthoDB database files from here: [link](https://data.orthodb.org/download/)
+2. download this repository - `git clone https://github.com/jacksonh1/slim_conservation_orthogroup_generation.git`
+3. navigate to this repository in terminal (where this README file is located) - `cd slim_conservation_orthogroup_generation`
+4. edit the file `./orthodb_tools/env_variables/.env` with the location of the downloaded orthoDB database files: `ORTHODB_DATA_DIR=/absolute/path/to/folder/with/orthodb_files/`
 5. create a new python environment with the dependencies: 
    - Mac - `conda env create -f environment.yml` <br>
        - if you have an ARM64 mac (M1/M2) you have to create an x86 environment to install all of the packages at this point in time
@@ -71,7 +71,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
           CONDA_SUBDIR=osx-64 conda create -n slim_conservation_orthogroup_generation
           conda activate slim_conservation_orthogroup_generation
           conda config --env --set subdir osx-64
-          conda update -f=envirenment.yml --name=slim_conservation_orthogroup_generation
+          conda env update --file=envirenment.yml --name=slim_conservation_orthogroup_generation
           ```
    - Linux/windows WSL - `conda env create -f environment_linux.yml` <br>
 6. activate the environment: `conda activate slim_conservation_orthogroup_generation` <br>
@@ -87,12 +87,12 @@ There are different ways to use this pipeline depending on your use case:
 - You may want to run the pipeline on a small number of genes from a table
 - Or you may want to run the pipeline on all of the proteins in an organism's proteome at different phylogenetic levels and use the output as a database for downstream conservation analysis. <br>
 
-examples of both of these use cases are shown in the `./examples/` directory. There are also command line scripts to run the pipeline for these use cases in `./src/local_scripts/`. (see [useful scripts](#useful-scripts-srclocal_scripts)) <br>
+examples of both of these use cases are shown in the `./examples/` directory. There are also command line scripts to run the pipeline for these use cases in `./orthodb_tools/scripts/`. (see [useful scripts](#useful-scripts-orthodb_toolsscripts)) <br>
 
 ## overview
-The main pipeline is executed via the script: `./src/local_scripts/odb_group_pipeline.py`. It can be run as a command line script or imported to be used in another script (like if you are running it on a lot of genes).
+The main pipeline can be executed via the script: `./orthodb_tools/scripts/orthogroup_pipeline.py`. <br>
 
-The script `./src/local_scripts/odb_group_pipeline.py` runs the pipeline for a single gene.<br>
+The script `./orthodb_tools/scripts/orthogroup_pipeline.py` runs the pipeline for a single gene.<br>
   - The gene can be specified using a uniprot ID or an odb_gene_id (see *brief explanation of the orthodb data* in [advanced.md](./advanced.md) for more info on the ids used in orthoDB).
   - it outputs files with the results in json format and alignments in fasta format (if alignment is specified in the parameters). <br>
 The output will look like this:
@@ -116,10 +116,10 @@ See the [examples](./examples/) folder for example output. <br>
 
 The easiest way to explain how to use the script is via the command line script help message:
 ```bash
-$ python ./src/local_scripts/odb_group_pipeline.py --help
+$ python ./orthodb_tools/scripts/orthogroup_pipeline.py --help
 ```
 ```
-usage: odb_group_pipeline.py [-h] (-unid <str> | -odbid <str>) [-c <file>]
+usage: orthogroup_pipeline.py [-h] (-unid <str> | -odbid <str>) [-c <file>]
 
 run main orthoDB group generation pipeline for a single gene
     processing parameters should be provided in a config file. (-c/--config)
@@ -151,32 +151,32 @@ You would probably very rarely want to run the pipeline as a command line script
 
 ### using the tools as a module
 
-importing the script as a module is very similar to using it as a command line script, see [example 2](./examples/ex2_table_with_uniprot_ids/) and [example 3](./examples/ex3_all_human_genes/) for examples.
+The pipeline can be imported and used from within a script, see [example 2](./examples/ex2_table_with_uniprot_ids/).
 
-In general you import the script as a module:
+In general you import the `orthodb_tools` package and then use the `orthogroup_pipeline` function. <br>:
 ```python
-import local_scripts.odb_group_pipeline as pipeline
+import orthodb_tools
 ```
-This import should work from anywhere in your filesystem because you installed the src code as a package, as long as the environment is activated (`conda activate slim_conservation_orthogroup_generation`). <br><br>
-The main function is `pipeline.main_pipeline` but it requires a configuration file to be loaded first (if using any non-default options). <br>
-This is done with the `pipeline.load_config` function:
+This import should work from anywhere in your filesystem because you installed the orthodb_tools code as a package, as long as the environment is activated (`conda activate slim_conservation_orthogroup_generation`). <br><br>
+The main function is `orthodb_tools.orthogroup_pipeline` but it requires a configuration file to be loaded first (if using any non-default options). <br>
+This is done with the `orthodb_tools.load_config` function:
 ```python
-config = pipeline.load_config("./params.yml")
+config = orthodb_tools.load_config("./params.yml")
 ```
-Then you can run the pipeline with the `pipeline.main_pipeline` function, which takes the `config` object as an argument and either a uniprot id or odb gene id as another argument:
+Then you can run the pipeline with the `orthodb_tools.orthogroup_pipeline` function, which takes the `config` object as an argument and either a uniprot id or odb gene id as another argument:
 ```python
-pipeline.main_pipeline(config, odb_gene_id="9606_0:002f40")
+orthodb_tools.orthogroup_pipeline(config, odb_gene_id="9606_0:002f40")
 ```
 or
 ```python
-pipeline.main_pipeline(config, uniprot_id="Q8TC90")
+orthodb_tools.orthogroup_pipeline(config, uniprot_id="Q8TC90")
 ```
-In this way, you can run the pipeline for any number of genes in a script as is shown is example 2 and example 3 <br>
+In this way, you can run the pipeline for any number of genes in a script as is shown in example 2 <br>
 
-## useful scripts: `./src/local_scripts/`
-There are a few scripts in the `./src/local_scripts/` directory that are useful for running the pipeline in different scenarios or provide some other common use. They are explained below: <br>
+## useful scripts: `./orthodb_tools/scripts/`
+There are a few scripts in the `./orthodb_tools/scripts/` directory that are useful for running the pipeline in different scenarios or provide some other common use. They are explained below: <br>
 
-- `odb_group_pipeline.py`: the main pipeline. (described above) <br>
+- `orthogroup_pipeline.py`: runs the main pipeline. (described above) <br>
 - `pipeline_all_genes_in_species.py`: runs the pipeline for all of the proteins in an organism (in the orthoDB) at different phylogenetic levels. The levels are "Eukaryota", "Mammalia", "Metazoa", "Tetrapoda", and "Vertebrata". But you can easily change this in the script if you wanted. The levels are currently hard coded but that could easily be changed. <br>
 - `pipeline_input_table.py`: Runs the pipeline for all of the proteins in a table that has a column of uniprot ids or odb gene ids. The pipeline is run for each unique gene. This is useful if you want to create a starting point for conservation analysis for just a specific set of genes (can be from different organisms as well).<br>
 - `create_filemap.py`: Intended to be run after the pipeline. It creates a json file that maps the odb_gene_ids to the generated files. This is useful if you are running the pipeline on a lot of genes and you want to keep track of the files. This also creates a "database key" for use in the [motif conservation pipeline](https://github.com/jacksonh1/motif_conservation_in_IDRs)<br>
@@ -184,10 +184,10 @@ There are a few scripts in the `./src/local_scripts/` directory that are useful 
     - outputs a new table with the orthoDB gene ids added as a new column
 
 For any of the above, you can run `python <script_name>.py --help` to see the help message. <br>
-For easy access to the scripts, you can add the `./src/local_scripts/` directory to your PATH. <br>
+For easy access to the scripts, you can add the `./orthodb_tools/scripts/` directory to your PATH. <br>
 example of how to add this directory to your path via your bashrc file:
 ```bash
-echo 'export PATH=$PATH:/path/to/this/repo/src/local_scripts/' >> ~/.bashrc
+echo 'export PATH=$PATH:/path/to/this/repo/orthodb_tools/scripts/' >> ~/.bashrc
 ```
 restart your terminal or run `source ~/.bashrc` to make the changes take effect. <br>
 
@@ -195,7 +195,9 @@ restart your terminal or run `source ~/.bashrc` to make the changes take effect.
 
 The pipeline parameters are specified in a yaml file. <br>
 If you are not familiar with yaml, it is fairly easy to understand by just looking at an example. Here is an example yaml file:<br>
-```yaml 
+```yaml
+overwrite: false
+
 filter_params:
   min_fraction_shorter_than_query: 0.5
 
@@ -217,6 +219,9 @@ More configuration files are used in the examples here so you can also just copy
 
 ### pipeline parameters explained
 Here is an explanation of the parameters and what they do:
+- `overwrite`: whether or not to overwrite the output files if they already exist. Can be one of:
+  - true: overwrite the output files
+  - false: do not overwrite the output files
 - `filter_params`:
   - `min_fraction_shorter_than_query`: A number between 0 and 1. Sequences that are shorter than `min_fraction_shorter_than_query`*(`length of query sequence`) will be removed from the group of sequences. <br>Default=0.5
 - `og_select_params`:
@@ -256,12 +261,9 @@ The main advantages of using these tools:
 - clustering
     - Clustering reduces sequence redundancy and results in a more even distribution of sequence diversity over the group, which is very helpful in a conservation analysis.
         - Imagine you had a group of 100 homologous sequences: 60 from mammals, all with > 95 % identity and 40 distributed across more distant Vertebrates. The conservation analysis would be dominated by the mammals and would not be very informative. Preclustering would collapse highly similar sequences (>90% identity by default) into one sequence, which would make the analysis more informative.
-Notes:
-This pipeline could probably benefit from using a workflow manager like snakemake or nextflow. However, I'm not sure if it would be worth the extra effort required for people to understand if they are unfamiliar with those tools. 
-I've considered using a config manager like hydra, but it has the same potential downfall. 
 
 # source code
-- see [src/readme.md](./src/readme.md) for more info on how the source code is structured
+- see [orthodb_tools/readme.md](./orthodb_tools/readme.md) for more info on how the source code is structured
 
 # tools used (and links):
 - [orthoDB database](https://www.orthodb.org/)

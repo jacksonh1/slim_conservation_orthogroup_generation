@@ -1,7 +1,7 @@
 import sqlite3
 from pathlib import Path
 
-from local_env_variables import env_variables as env
+from orthodb_tools.env_variables import env_variables as env
 
 
 def uniprotid_2_odb_gene_id_refs(
@@ -112,7 +112,7 @@ def odb_gene_id_2_uniprotid(
     if len(result) == 0:
         # raise ValueError(f"no uniprot id found for gene id {odb_gene_id}")
         return ""
-    uniprot_id =result[0][0]
+    uniprot_id = result[0][0]
     return uniprot_id
 
 

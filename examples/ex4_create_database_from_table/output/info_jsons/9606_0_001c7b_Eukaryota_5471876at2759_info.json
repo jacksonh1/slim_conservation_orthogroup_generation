@@ -2847,7 +2847,7 @@
         "103695_0:0048c4",
         "216574_0:003c68"
     ],
-    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpnb667rj1 -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpnb667rj1-cdhit.fa -M 0 -d 0 -g 1 ",
+    "cdhit_command": "cd-hit -i /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmptvw4ojpj -o /var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmptvw4ojpj-cdhit.fa -M 0 -d 0 -g 1 ",
     "species_map": {
         "54969_0:00071d": "Polypedilum nubifer",
         "36723_0:00125d": "Mustela erminea",
@@ -3213,8 +3213,9 @@
         "_cd_hit_exe": "cd-hit",
         "_cd_hit_additional_args": "",
         "main_output_folder": "output",
-        "write_files": true
+        "write_files": true,
+        "overwrite": false
     },
     "alignment_clustered_ldos_file": "/Users/jackson/Dropbox (MIT)/work/07-SLiM_bioinformatics/04-orthoDB_local_orthogroup_creation/examples/ex4_create_database_from_table/output/alignments/9606_0_001c7b_Eukaryota_5471876at2759_clustered_ldos_aln.fasta",
-    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpcyhowtbg\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmpcyhowtbg-mafft.fa\""
+    "alignment_clustered_ldos_command": "mafft --thread 8 --quiet --anysymbol  \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp_1e91bhd\" > \"/var/folders/q4/k476_qrd3jvdvzwd6lq30kqc0000gn/T/tmp_1e91bhd-mafft.fa\""
 }

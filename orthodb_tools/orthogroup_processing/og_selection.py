@@ -1,10 +1,10 @@
-
 import pandas as pd
 
-import local_env_variables.env_variables as env
-import local_orthoDB_group_pipeline.sql_queries as sql_queries
+import orthodb_tools.env_variables.env_variables as env
+import orthodb_tools.sql_queries as sql_queries
 
-ODB_DATABASE = env.orthoDB_database()
+ODB_DATABASE = env.orthoDBDatabase()
+
 
 def _ogid_list_2_og_info_df(ogid_list: list[str]) -> pd.DataFrame:
     og_query_results = []
@@ -32,12 +32,10 @@ def ogid_list_2_og_level_info_df(ogid_list: list[str]) -> pd.DataFrame:
             "OG name",
         ]
     ]
-    query_available_OGs_info_df[
-        "total non-redundant count of species underneath"
-    ] = query_available_OGs_info_df[
-        "total non-redundant count of species underneath"
-    ].astype(
-        int
+    query_available_OGs_info_df["total non-redundant count of species underneath"] = (
+        query_available_OGs_info_df[
+            "total non-redundant count of species underneath"
+        ].astype(int)
     )
     # query_OG_info_df = query_OG_info_df.infer_objects()
     query_available_OGs_info_df = query_available_OGs_info_df.sort_values(
@@ -83,4 +81,7 @@ def select_OG_by_level_name(odb_gene_id: str, level_name: str) -> tuple[str, str
         raise ValueError(
             f"Multiple OGs found for {odb_gene_id} with level name `{level_name}`. duplicate OGs: {selected_OG_info_df}"
         )
-    return selected_OG_info_df["OG id"].values[0], selected_OG_info_df["level name"].values[0]
+    return (
+        selected_OG_info_df["OG id"].values[0],
+        selected_OG_info_df["level name"].values[0],
+    )
