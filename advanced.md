@@ -35,7 +35,7 @@ if you have MAFFT and/or CD-HIT installed somewhere else and would prefer to use
 You can add also add additional command line arguments to the MAFFT and CD-HIT commands by editing the `MAFFT_ADDITIONAL_ARGUMENTS` and `CD_HIT_ADDITIONAL_ARGUMENTS` variables in the `.env` file. <br>
 Those variables are set to empty strings by default, but they are inserted into the mafft/cd-hit commands where extra arguments would go:
 - Mafft: `{MAFFT_EXECUTABLE} --thread {n_align_threads} --quiet --anysymbol {MAFFT_ADDITIONAL_ARGUMENTS} {input_file} > {output_alignment}`
-- CD-hit: `{CD_HIT_EXECUTABLE} -i {input_file} -o {output_file} -M 0 -d 0 {CD_HIT_ADDITIONAL_ARGUMENTS}` <br>
+- CD-hit: `{CD_HIT_EXECUTABLE} -i {input_file} -o {output_file} -M 0 -d 0 -g 1 {CD_HIT_ADDITIONAL_ARGUMENTS}` <br>
   - Note that for CD-HIT, the default of 90% sequence identity is used, therefore you can change the clustering % identity by providing it to the CD_HIT_ADDITIONAL_ARGUMENTS variable <br>
   - For example, if you wanted to change the clustering step to cluster the sequences to 80% identity, you would change the `CD_HIT_ADDITIONAL_ARGUMENTS` variable in the `.env` file to `-c 0.8` <br>
 

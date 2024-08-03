@@ -20,9 +20,9 @@ This work was supported by the National Institutes of Health under Award Number 
 - [source code](#source-code)
 - [tools used (and links):](#tools-used-and-links)
 
-# orthoDB groups for conservation analysis
+# orthologous groups for conservation analysis
 This repository contains tools to retrieve and process ortholog groups from a local copy of the orthoDB database files ([link](https://www.orthodb.org/)). The pipeline finds a protein of interest in the database, retrieves its homologous proteins as defined by the orthoDB, and processes the group of homologs in preparation for downstream [conservation analysis](https://github.com/jacksonh1/motif_conservation_in_IDRs). <br>
-- Note: I refer  to these sequences as orthologs in many places throughout this repo but it is probably more accurate to refer to them as homologs. I use the term orthologs because that is what orthoDB calls them. see orthoDB [terminology](https://www.ezlab.org/orthodb_userguide.html#terminology)
+- Note: I refer  to these sequences as orthologs in many places throughout this repo but you could argue that it's more accurate to refer to them as homologs depending on how you define the term. I use the term orthologs because that is what orthoDB calls them. see orthoDB [terminology](https://www.ezlab.org/orthodb_userguide.html#terminology)
 
 
 ## Pipeline overview:

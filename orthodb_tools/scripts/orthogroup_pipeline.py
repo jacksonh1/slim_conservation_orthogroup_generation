@@ -7,7 +7,6 @@ from orthodb_tools.config import orthodb_pipeline_parameters
 
 
 import orthodb_tools.orthogroup_processing.pipeline as pipeline
-from orthodb_tools.config import orthodb_pipeline_parameters
 
 
 if __name__ == "__main__":
