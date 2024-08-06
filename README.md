@@ -5,8 +5,9 @@ This work was supported by the National Institutes of Health under Award Number 
 
 # Table of contents
 - [Table of contents](#table-of-contents)
-- [orthoDB groups for conservation analysis](#orthodb-groups-for-conservation-analysis)
+- [orthologous groups for conservation analysis](#orthologous-groups-for-conservation-analysis)
   - [Pipeline overview:](#pipeline-overview)
+  - [note on future improvements](#note-on-future-improvements)
 - [necessary background knowledge (beginner level)](#necessary-background-knowledge-beginner-level)
 - [setup TL;DR:](#setup-tldr)
 - [Usage](#usage)
@@ -41,10 +42,13 @@ This repository contains tools to retrieve and process ortholog groups from a lo
 8. **output** the alignment and the ortholog group information in a directory structure that is compatible with the conservation analysis pipeline (link)
     - the group information is output in the form of a json file that can be imported into python
 
+## note on future improvements
+- I wanted to avoid using a workflow manager (e.g. snakemake or nextflow) and a more sophisticated database structure because I wanted to keep the pipeline easy for anyone to use, however, I think the result is potentially more confusing. If I had the time, I might refactor everything to use a workflow manager to handle the pipeline and a different database structure to store the data. It might make the pipeline more efficient and easier to use. <br>
+
 # necessary background knowledge (beginner level)
 - **basic use of a unix terminal** (i.e. navigating directories, running scripts, etc.). If you are unfamiliar with this, here's where to start:
   - Make sure you can open a terminal.
-    - **windows** - I recommend using the windows subsystem for linux (WSL) and using the default ubuntu linux distribution (https://learn.microsoft.com/en-us/windows/wsl/install). Note, I know close to nothing about windows, which is why I'm recommending using wsl, which is basically just linux within windows. People who are knowlegable about windows may not have to do this.
+    - **windows** - I recommend using the windows subsystem for linux (WSL) and using the default ubuntu linux distribution (https://learn.microsoft.com/en-us/windows/wsl/install). Note, I know very little about windows, which is why I'm recommending using wsl, which is basically just linux within windows. People who are knowlegable about windows may not have to do this.
     - **Mac** - you can use the default terminal app under applications/utilities
     - **Linux** - you probably already know how to use the terminal
   - do a quick tutorial to get the basics of navigating directories and running scripts.
@@ -75,7 +79,7 @@ This repository contains tools to retrieve and process ortholog groups from a lo
           ```
    - Linux/windows WSL - `conda env create -f environment_linux.yml` <br>
 6. activate the environment: `conda activate slim_conservation_orthogroup_generation` <br>
-7. install the local package: `pip install -e .` <br>
+7. install the local package: `pip install .` <br>
 8. generate the SQLite databases: `bash ./prepare_data.sh` <br>
    - *Note: This creates separate databases for each file. You could easily make one database with all of the tables, however I tried this and it was significantly slower to query. I don't know why.* <br>
 
