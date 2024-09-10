@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import multiprocessing
 import shutil
@@ -105,7 +107,7 @@ def main(
             multiple_levels(config, i, og_levels, id_type)
 
 
-if __name__ == "__main__":
+def main_cli():
     parser = argparse.ArgumentParser(
         description="run the pipeline for all odb_gene_ids in an input table",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -178,3 +180,7 @@ if __name__ == "__main__":
     #     config.main_output_folder,
     #     output_file=Path(config.main_output_folder) / "filemap.json",
     # )
+
+
+if __name__ == "__main__":
+    main_cli()

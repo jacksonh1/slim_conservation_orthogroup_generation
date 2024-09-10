@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 from pathlib import Path
 
@@ -48,7 +50,7 @@ def main(
     table.to_csv(output_file, index=False)
 
 
-if __name__ == "__main__":
+def main_cli():
     parser = argparse.ArgumentParser(
         description="""maps a column of uniprot ids in a table to orthoDB gene ids.
 exports a copy of the table with a new column containing the orthoDB gene ids.\n
@@ -81,3 +83,7 @@ information will be stripped before mapping, e.g. "P12345-1" -> "P12345".""",
     )
     args = parser.parse_args()
     main(args.input, args.uni_column, args.output)
+
+
+if __name__ == "__main__":
+    main_cli()

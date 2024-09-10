@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import multiprocessing
 import shutil
@@ -57,7 +59,7 @@ def main(
             multiple_levels(config, i, og_levels)
 
 
-if __name__ == "__main__":
+def main_cli():
     OG_LEVELS = ["Eukaryota", "Mammalia", "Metazoa", "Tetrapoda", "Vertebrata"]
     parser = argparse.ArgumentParser(
         description="run the pipeline for all genes in an organism",
@@ -115,3 +117,7 @@ if __name__ == "__main__":
     #     config.main_output_folder,
     #     output_file=Path(config.main_output_folder) / "filemap.json",
     # )
+
+
+if __name__ == "__main__":
+    main_cli()

@@ -188,7 +188,19 @@ There are a few scripts in the `./orthodb_tools/scripts/` directory that are use
     - outputs a new table with the orthoDB gene ids added as a new column
 
 For any of the above, you can run `python <script_name>.py --help` to see the help message. <br>
-For easy access to the scripts, you can add the `./orthodb_tools/scripts/` directory to your PATH. <br>
+
+In the current version of these tools, the scripts should be accessible in your path as long as the environment in which you pip installed the tools is activated. They are installed as scripts in the environment and are accessible with the `odb_groups-` prefix. For example:
+
+| script                             | command                                    |
+| ---------------------------------- | ------------------------------------------ |
+| `orthogroup_pipeline.py`           | `odb_groups-orthogroup_pipeline`           |
+| `pipeline_all_genes_in_species.py` | `odb_groups-pipeline_all_genes_in_species` |
+| `pipeline_input_table.py`          | `odb_groups-pipeline_input_table`          |
+| `create_filemap.py`                | `odb_groups-create_filemap`                |
+| `map_uniprotid.py`                 | `odb_groups-map_uniprotid`                 |
+
+<br>
+If not, you can add the `./orthodb_tools/scripts/` directory to your PATH. <br>
 example of how to add this directory to your path via your bashrc file:
 ```bash
 echo 'export PATH=$PATH:/path/to/this/repo/orthodb_tools/scripts/' >> ~/.bashrc
