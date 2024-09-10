@@ -5,8 +5,10 @@ import multiprocessing
 import shutil
 import traceback
 from pathlib import Path
+from attrs import asdict
 
 import orthodb_tools.config.orthodb_pipeline_parameters as conf
+from orthodb_tools.config import orthodb_pipeline_parameters
 import orthodb_tools.sql_queries as sql_queries
 
 # import orthodb_tools.scripts.create_filemap as create_filemap
@@ -61,9 +63,28 @@ def main(
 
 def main_cli():
     OG_LEVELS = ["Eukaryota", "Mammalia", "Metazoa", "Tetrapoda", "Vertebrata"]
+    d_params = ""
+    for k, v in asdict(
+        orthodb_pipeline_parameters.PipelineParams(),
+        filter=lambda attr, value: not str(attr.name).startswith("_"),
+    ).items():
+        d_params += f"- {k}: {v}\n"
+
     parser = argparse.ArgumentParser(
-        description="run the pipeline for all genes in an organism",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=f"""run the pipeline for all genes in an organism. 
+    processing parameters should be provided in a config file. (-c/--config)
+    if no config file is provided, default parameters will be used
+    The default parameters are:
+{d_params}""",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument(
+        "-s",
+        "--species_id",
+        type=str,
+        metavar="<str>",
+        required=True,
+        help=f"""species id to use. For example, '{SPECIES_ID}' for human""",
     )
     parser.add_argument(
         "-c",
@@ -79,15 +100,7 @@ def main_cli():
         type=int,
         metavar="<int>",
         default=N_CORES,
-        help=f"""number of cores to use""",
-    )
-    parser.add_argument(
-        "-s",
-        "--species_id",
-        type=str,
-        metavar="<str>",
-        default=SPECIES_ID,
-        help=f"""species id to use""",
+        help=f"""number of cores to use. Default is the number available on your machine minus 2 ({N_CORES})""",
     )
     parser.add_argument(
         "-l",
@@ -95,7 +108,7 @@ def main_cli():
         nargs="*",
         metavar="<list>",
         default=OG_LEVELS,
-        help=f"""list of phylogenetic levels at which to construct ortholog groups""",
+        help=f"""list of phylogenetic levels at which to construct ortholog groups. Default is {OG_LEVELS}""",
     )
     parser.add_argument(
         "-o",

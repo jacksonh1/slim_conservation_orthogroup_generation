@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 import argparse
 import multiprocessing
 import shutil
@@ -13,6 +14,8 @@ import orthodb_tools.config.orthodb_pipeline_parameters as conf
 import orthodb_tools.sql_queries as sql_queries
 
 # import local_scripts.create_filemap as create_filemap
+from orthodb_tools.config import orthodb_pipeline_parameters
+from attrs import asdict
 import orthodb_tools.orthogroup_processing.pipeline as pipeline
 
 N_CORES = multiprocessing.cpu_count() - 2
@@ -108,9 +111,19 @@ def main(
 
 
 def main_cli():
+    d_params = ""
+    for k, v in asdict(
+        orthodb_pipeline_parameters.PipelineParams(),
+        filter=lambda attr, value: not str(attr.name).startswith("_"),
+    ).items():
+        d_params += f"- {k}: {v}\n"
     parser = argparse.ArgumentParser(
-        description="run the pipeline for all odb_gene_ids in an input table",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=f"""run the pipeline for all odb_gene_ids in an input table
+    processing parameters should be provided in a config file. (-c/--config)
+    if no config file is provided, default parameters will be used
+    The default parameters are:
+{d_params}""",
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
         "-c",
@@ -126,7 +139,7 @@ def main_cli():
         type=int,
         metavar="<int>",
         default=N_CORES,
-        help=f"""number of cores to use""",
+        help=f"""number of cores to use. Default is the number available on your machine minus 2 ({N_CORES})""",
     )
     parser.add_argument(
         "-t",
@@ -160,7 +173,7 @@ def main_cli():
         nargs="*",
         metavar="<list>",
         default=OG_LEVELS,
-        help=f"""list of orthologous group levels to run the pipeline for""",
+        help=f"""list of orthologous group levels to run the pipeline for. Default is {OG_LEVELS}""",
     )
     args = parser.parse_args()
     # for arg in vars(args):
